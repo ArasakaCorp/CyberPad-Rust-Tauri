@@ -1,0 +1,62 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "CyberPad",
+  "version": "0.1.0",
+  "identifier": "com.Arasaka.CyberPad",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:5173",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "CyberPad",
+        "width": 1100,
+        "height": 700,
+        "decorations": false,
+        "transparent": true,
+        "alwaysOnTop": false,
+        "shadow": false,
+        "dragDropEnabled": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": ["nsis", "msi"],
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "allowDowngrades": true,
+
+      "webviewInstallMode": {
+        "type": "downloadBootstrapper",
+        "silent": true
+      },
+
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "installMode": "currentUser",
+        "startMenuFolder": "CyberPad",
+        "displayLanguageSelector": false,
+        "compression": "lzma"
+      },
+
+      "wix": {
+        "language": "en-US",
+        "upgradeCode": "4314b947-597f-55fd-917a-cf735a07aaa6"
+      }
+    }
+  }
+}
