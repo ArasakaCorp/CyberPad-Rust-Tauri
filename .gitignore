@@ -1,0 +1,91 @@
+# =========================
+# Node / Vite
+# =========================
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Vite cache
+.vite/
+.cache/
+
+# =========================
+# Tauri / Rust
+# =========================
+src-tauri/target/
+src-tauri/.cargo/
+
+# Cargo lock (опционально)
+# Оставь, если это приложение (рекомендуется)
+# Убери игнор, если уже отслеживается
+# Cargo.lock
+
+# =========================
+# Build artifacts
+# =========================
+*.exe
+*.msi
+*.dll
+*.so
+*.dylib
+
+# Allow icon and assets
+!src-tauri/icons/*.ico
+!src-tauri/icons/*.icns
+
+# Allow portable release if needed (optional)
+# !release/*.exe
+
+# =========================
+# OS junk
+# =========================
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# =========================
+# IDE / Editor
+# =========================
+
+# VSCode
+.vscode/
+!.vscode/extensions.json
+
+# JetBrains / PhpStorm / IntelliJ
+.idea/
+
+# Windows
+*.pdb
+
+# =========================
+# Tauri dev files
+# =========================
+src-tauri/gen/
+src-tauri/bundle/
+
+# =========================
+# Env files
+# =========================
+.env
+.env.*
+!.env.example
+
+# =========================
+# Temporary files
+# =========================
+*.tmp
+*.temp
+*.log
+
+# =========================
+# Optional: keep release builds
+# =========================
+# Uncomment if you want to version portable exe
+# !release/
