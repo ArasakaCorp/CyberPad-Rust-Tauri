@@ -8,42 +8,51 @@ import { initDrawer } from "./features/drawer.js";
 import { initCounter } from "./features/counter.js";
 import { initShortcuts } from "./features/shortcuts.js";
 
-import { initWindowButtons, initOpenSave } from "./features/fileActions.js";
+import { initWindowButtons, initOpenSave, applyOpenedFile } from "./features/fileActions.js";
 import { initAutosave } from "./features/autosave.js";
 import { initRecent, pushRecent } from "./features/recentFiles.js";
 import { initHistory } from "./features/history.js";
 import { initDragDrop } from "./features/dragDrop.js";
 import { initCredits } from "./features/credits.js";
+import { initLastFile } from "./features/lastFile.js";
+
+async function main() {
+    const root = document.querySelector("#app");
+    renderLayout(root);
 
 
+    const dom = getDom();
+    const state = createState();
+    const history = initHistory(dom, state, { limit: 200, debounceMs: 300 });
+    history.reset("");
 
-const root = document.querySelector("#app");
-renderLayout(root);
+    initWindowButtons(dom);
+    initDrawer(dom);
+    initCounter(dom);
+    initShortcuts(dom);
+    initCredits(dom, state);
 
+    initRecent(dom, state);
 
-const dom = getDom();
-const state = createState();
-const history = initHistory(dom, state, { limit: 200, debounceMs: 300 });
-history.reset("");
+    const autosave = initAutosave(dom, state, {
+        debounceMs: 1200,
+        intervalMs: 20000
+    });
 
-initWindowButtons(dom);
-initDrawer(dom);
-initCounter(dom);
-initShortcuts(dom);
-initCredits(dom, state);
+    const onOpened = (filePath) => {
+        pushRecent(dom, filePath);
+        autosave.setAutosaveState("idle");
+        history.reset(dom.editor.value);
+    };
 
-initRecent(dom, state);
+    const { onOpened: onOpenedWithLast } = await initLastFile(dom, state, {
+        applyOpenedFile,
+        onOpened,
+        autoOpen: true
+    });
 
-const autosave = initAutosave(dom, state, {
-    debounceMs: 1200,
-    intervalMs: 20000
-});
+    initOpenSave(dom, state, { onOpened: onOpenedWithLast });
+    initDragDrop(dom, state, { onOpened: onOpenedWithLast });
+}
 
-const onOpened = (filePath) => {
-    pushRecent(dom, filePath);
-    autosave.setAutosaveState("idle");
-    history.reset(dom.editor.value);
-};
-
-initOpenSave(dom, state, { onOpened });
-initDragDrop(dom, state, { onOpened });
+main();
