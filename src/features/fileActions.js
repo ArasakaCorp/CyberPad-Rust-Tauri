@@ -4,7 +4,9 @@ import { closeDrawer } from "./drawer.js";
 import { invoke } from "@tauri-apps/api/core"; // если v1, будет "@tauri-apps/api/tauri"
 
 export function syncSaveState(dom, state) {
-    dom.menuSave.disabled = !(state.currentFilePath && state.dirty);
+    // Save is always available; Save As is always available.
+    dom.menuSave.disabled = false;
+    dom.menuSaveAs.disabled = false;
 }
 
 export function applyOpenedFile(dom, state, res) {
@@ -13,7 +15,10 @@ export function applyOpenedFile(dom, state, res) {
     state.currentFilePath = res.filePath;
     state.dirty = false;
 
-    dom.topFile.textContent = fileNameFromPath(res.filePath);
+    const name = fileNameFromPath(res.filePath);
+    dom.topFile.textContent = name;
+    dom.topFile.dataset.fileName = name;
+
     dom.editor.value = res.content ?? "";
     updateCharCount(dom);
 
@@ -21,14 +26,18 @@ export function applyOpenedFile(dom, state, res) {
 }
 
 export function showSavedIndicator(dom) {
-    const original = dom.topFile.textContent;
+    // cancel previous timer if user saves quickly
+    if (dom.__savedTimer) clearTimeout(dom.__savedTimer);
+
+    const original = dom.topFile.dataset.fileName || dom.topFile.textContent || "NOTE.txt";
 
     dom.topFile.textContent = "SAVED";
     dom.topFile.classList.add("saved");
 
-    setTimeout(() => {
+    dom.__savedTimer = setTimeout(() => {
         dom.topFile.textContent = original;
         dom.topFile.classList.remove("saved");
+        dom.__savedTimer = null;
     }, 700);
 }
 
@@ -49,8 +58,13 @@ export function initOpenSave(dom, state, { onOpened }) {
     });
 
     dom.menuSave.addEventListener("click", async () => {
-        if (!(state.currentFilePath && state.dirty)) return;
         closeDrawer(dom);
+
+        // Save behaves like Save As if we don't have a target path yet
+        if (!state.currentFilePath) {
+            dom.menuSaveAs.click();
+            return;
+        }
 
         dom.menuSave.disabled = true;
 
@@ -115,7 +129,8 @@ export function initOpenSave(dom, state, { onOpened }) {
         state.dirty = false;
 
         // UI
-        dom.topFile.textContent = "UNTITLED";
+        dom.topFile.textContent = "NOTE.txt";
+        dom.topFile.dataset.fileName = "NOTE.txt";
         dom.editor.value = "";
         updateCharCount(dom);
 

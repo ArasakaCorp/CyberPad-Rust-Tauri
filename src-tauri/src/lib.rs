@@ -1,5 +1,6 @@
 use serde::Serialize;
 use tauri_plugin_dialog::DialogExt;
+use std::path::{Path, PathBuf};
 
 #[derive(Serialize)]
 struct SaveResponse {
@@ -13,6 +14,19 @@ struct FilePayload {
     file_path: String,
 
     content: String,
+}
+
+fn ensure_extension(path: &str, default_ext: &str) -> String {
+    let p = Path::new(path);
+
+    // If the user already provided an extension, keep it
+    if p.extension().is_some() {
+        return path.to_string();
+    }
+
+    let mut pb = PathBuf::from(p);
+    pb.set_extension(default_ext.trim_start_matches('.'));
+    pb.to_string_lossy().to_string()
 }
 
 // --- window controls ---
@@ -58,6 +72,9 @@ Some(FilePayload {
 
 #[tauri::command]
 fn save_file(path: String, content: String) -> SaveResponse {
+    // Default extension if missing:
+    let path = ensure_extension(&path, "txt");
+
     match std::fs::write(&path, content) {
         Ok(_) => SaveResponse { ok: true, error: None },
         Err(e) => SaveResponse { ok: false, error: Some(e.to_string()) },
@@ -73,10 +90,15 @@ async fn save_as_dialog(
     let fp = app
         .dialog()
         .file()
+        .add_filter("Text", &["txt", "log"])
+        .add_filter("Markdown", &["md"])
+        .add_filter("All files", &["*"])
         .set_file_name(suggested_name)
-        .blocking_save_file()?;
+        .blocking_save_file()?; // ok if you intentionally want blocking
 
-    let path = file_path_to_string(fp)?;
+    let raw_path = file_path_to_string(fp)?;
+    let path = ensure_extension(&raw_path, "txt");
+
     std::fs::write(&path, content).ok()?;
 
     Some(FilePayload {
@@ -95,6 +117,11 @@ fn open_path(path: String) -> Option<FilePayload> {
     })
 }
 
+#[tauri::command]
+fn path_exists(path: String) -> bool {
+    std::path::Path::new(&path).exists()
+}
+
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
@@ -105,7 +132,8 @@ pub fn run() {
             open_file_dialog,
             save_file,
             save_as_dialog,
-            open_path
+            open_path,
+            path_exists
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

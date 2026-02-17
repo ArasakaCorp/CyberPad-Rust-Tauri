@@ -13,7 +13,7 @@ export function renderLayout(root) {
         <header class="header drag">
           <div class="header-title">
             <span class="chip-icon"><img src="${iconUrl}" alt=""></span>
-            <span id="topFile" class="header-value">NONE</span>
+            <span id="topFile" class="header-value">NOTE.txt</span>
           </div>
 
           <div class="header-actions no-drag">
@@ -26,7 +26,7 @@ export function renderLayout(root) {
           <div class="drawer-inner">
             <button id="menuNew" class="menu-item">NEW</button>
             <button id="menuOpen" class="menu-item">OPEN</button>
-            <button id="menuSave" class="menu-item" disabled>SAVE</button>
+            <button id="menuSave" class="menu-item">SAVE</button>
             <button id="menuSaveAs" class="menu-item">SAVE AS…</button>
 
             <div class="drawer-sep"></div>
