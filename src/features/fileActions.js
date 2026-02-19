@@ -46,15 +46,15 @@ export function initWindowButtons(dom) {
     dom.closeBtn.addEventListener("click", () => void invoke("close_app"));
 }
 
-export function initOpenSave(dom, state, { onOpened }) {
+export function initOpenSave(dom, state, { onOpened , tabs}) {
     dom.menuOpen.addEventListener("click", async () => {
         closeDrawer(dom);
 
         const res = await invoke("open_file_dialog");
         if (!res) return;
 
-        applyOpenedFile(dom, state, res);
-        onOpened?.(res.filePath);
+        const tab = tabs ? tabs.openPayloadInNewTab(res) : (applyOpenedFile(dom, state, res), null);
+        onOpened?.(tab?.filePath ?? res.filePath);
     });
 
     dom.menuSave.addEventListener("click", async () => {
@@ -100,6 +100,17 @@ export function initOpenSave(dom, state, { onOpened }) {
             });
 
             if (!res?.filePath) return;
+            if (tabs) {
+                const active = tabs.getActiveTab();
+                if (active) {
+                    active.filePath = res.filePath;
+                    active.name = fileNameFromPath(res.filePath);
+                    active.content = dom.editor.value;
+                    active.dirty = false;
+
+                    tabs.render(); // обновить полоски
+                }
+            }
 
             applyOpenedFile(dom, state, { filePath: res.filePath, content: dom.editor.value });
             showSavedIndicator(dom);

@@ -34,6 +34,9 @@ export function initAutosave(dom, state, opts = {}) {
         setAutosaveState("saving");
 
         try {
+            const active = tabs?.getActiveTab?.();
+            if (!active?.filePath || !active.dirty) return;
+
             const res = await invoke("save_file", {
                 path: state.currentFilePath,
                 content: dom.editor.value,

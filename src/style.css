@@ -1,11 +1,24 @@
 :root{
     --bg: #070b10;
     --panel: rgba(8, 16, 22, 0.66);
-    --cyan: #33d6ff;
-    --cyanDim: rgba(51,214,255,0.25);
+
+    /* semantic theme tokens */
+    --accent: #33d6ff;
+    --accent-dim: rgba(51,214,255,0.25);
+
     --text: #cfe9f2;
     --muted: rgba(207, 233, 242, 0.55);
+
     --shadow: rgba(0,0,0,0.55);
+
+    /* status colors (future themes will override these) */
+    --success: #33ffcc;
+    --warning: rgba(255,176,0,0.95);
+
+    /* tab strip */
+    --tab-h: 10px;
+    --tab-gap: 8px;
+    --tab-radius: 999px;
 }
 /* FONTS */
 
@@ -132,7 +145,7 @@ html, body{
     align-items:center;
     justify-content: space-between;
     padding: 0 14px;
-    border-bottom: 1px solid rgba(51,214,255,0.18);
+ /*   border-bottom: 1px solid rgba(51,214,255,0.18);*/
     background: rgba(0,0,0,0.08);
     min-height: 0;
 }
@@ -535,12 +548,11 @@ textarea{
 
 /* временный статус сохранения */
 .header-value.saved{
-    color: #33ffcc;
-
+    color: var(--success);
     text-shadow:
-            0 0 6px rgba(51,255,204,0.8),
-            0 0 18px rgba(51,255,204,0.6),
-            0 0 32px rgba(51,255,204,0.4);
+            0 0 6px color-mix(in srgb, var(--success) 80%, transparent),
+            0 0 18px color-mix(in srgb, var(--success) 60%, transparent),
+            0 0 32px color-mix(in srgb, var(--success) 40%, transparent);
 
     letter-spacing: 0.35em;
 
@@ -712,3 +724,70 @@ textarea{
     color: rgba(51,214,255,1);
     border-bottom-color: rgba(51,214,255,0.9);
 }
+
+/* --- TAB STRIP (HUD slots) --- */
+.tabstrip{
+    position: relative;
+    padding: 0 14px 4px 14px;
+    border-bottom: 0;
+    background: rgba(0,0,0,0.02);
+    margin-top: -3px;
+}
+.tabs{
+    display: flex;         /* ✅ вернуть */
+    align-items: center;
+    gap: 6px;              /* ✅ вернуть */
+    height: 10px;          /* физическая зона */
+}
+
+/* button reset + reliable rendering */
+.tab{
+    flex: 1;
+    height: 10px;          /* ✅ hitbox */
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background: transparent;
+    cursor: pointer;
+    outline: none;
+    position: relative;    /* для псевдоэлемента */
+    opacity: 0.55;
+}
+
+/* the 1px visible line lives inside */
+.tab::after{
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 50%;
+    height: 1px;           /* ✅ visual thickness */
+    transform: translateY(-50%);
+    border-radius: 999px;
+    background: rgba(51,214,255,0.12);
+    box-shadow: 0 0 10px rgba(51,214,255,0.06);
+    pointer-events: none;  /* ✅ hover/click stays on button */
+}
+
+.tab:hover{
+    opacity: 0.9;
+}
+
+.tab:hover::after{
+    background: rgba(51,214,255,0.22);
+    box-shadow: 0 0 16px rgba(51,214,255,0.12);
+}
+
+.tab[aria-selected="true"]{
+    opacity: 1;
+}
+
+.tab[aria-selected="true"]::after{
+    background: rgba(51,214,255,0.45);
+    box-shadow: 0 0 22px rgba(51,214,255,0.20);
+}
+
+.tab.tab-dim{
+    opacity: 0.22;
+}
+

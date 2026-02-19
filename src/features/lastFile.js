@@ -58,8 +58,13 @@ export async function initLastFile(dom, state, deps = {}) {
         const res = await invoke("open_path", { path: lastPath });
         if (!res?.filePath) return { onOpened };
 
-        applyOpenedFile(dom, state, res);
-        onOpened(res.filePath);
+        if (deps.tabs) {
+            deps.tabs.openPayloadInNewTab(res);
+            onOpened(res.filePath);
+        } else {
+            applyOpenedFile(dom, state, res);
+            onOpened(res.filePath);
+        }
 
         return { onOpened };
     } catch {

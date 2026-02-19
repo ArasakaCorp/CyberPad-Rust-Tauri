@@ -21,6 +21,21 @@ export function renderLayout(root) {
             <button id="closeBtn" class="wbtn close" title="Close">X</button>
           </div>
         </header>
+        
+        <div class="tabstrip no-drag" aria-label="Tabs">
+          <div class="tabs" id="tabs" role="tablist" aria-hidden="true">
+<!--            <button class="tab" type="button" role="tab" aria-selected="true" title="NOTE.txt"></button>-->
+<!--                        <button class="tab" type="button" role="tab" aria-selected="false" title="untitled-2.txt"></button>-->
+
+<!--            <button class="tab" type="button" role="tab" aria-selected="false" title="untitled-2.txt"></button>-->
+<!--            <button class="tab" type="button" role="tab" aria-selected="false" title="untitled-2.txt"></button>-->
+<!--            <button class="tab" type="button" role="tab" aria-selected="false" title="untitled-2.txt"></button>-->
+<!--            <button class="tab" type="button" role="tab" aria-selected="false" title="untitled-2.txt"></button>-->
+
+<!--            <button class="tab tab-dim" type="button" role="tab" aria-selected="false" title="log.sql"></button>-->
+          </div>
+          <div class="tabstrip-line" aria-hidden="true"></div>
+        </div>
 
         <div id="drawer" class="drawer" aria-hidden="true">
           <div class="drawer-inner">

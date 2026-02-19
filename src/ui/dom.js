@@ -12,6 +12,7 @@ export function getDom() {
         menuSaveAs: document.querySelector("#menuSaveAs"),
         autosaveStatus: document.querySelector("#autosaveStatus"),
         charCountEl: document.querySelector("#charCount"),
-        recentList: document.querySelector("#recentList")
+        recentList: document.querySelector("#recentList"),
+        tabs: document.querySelector("#tabs")
     };
 }
