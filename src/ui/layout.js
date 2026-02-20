@@ -25,7 +25,6 @@ export function renderLayout(root) {
         <div class="tabstrip no-drag" aria-label="Tabs">
           <div class="tabs" id="tabs" role="tablist" aria-hidden="true">
           </div>
-          <div class="tabstrip-line" aria-hidden="true"></div>
         </div>
 
         <div id="drawer" class="drawer" aria-hidden="true">

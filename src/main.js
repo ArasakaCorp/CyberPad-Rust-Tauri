@@ -14,7 +14,6 @@ import { initRecent, pushRecent } from "./features/recentFiles.js";
 import { initHistory } from "./features/history.js";
 import { initDragDrop } from "./features/dragDrop.js";
 import { initCredits } from "./features/credits.js";
-import { initLastFile } from "./features/lastFile.js";
 import { initTabs } from "./features/tabs/TabsController.js";
 
 async function main() {
@@ -35,7 +34,7 @@ async function main() {
     await initCredits(dom, state);
     await initRecent(dom, state);
 
-    const tabs = initTabs(dom, state, {
+    const tabs = await initTabs(dom, state, {
         onOpened: tab => pushRecent(dom, tab.filePath)
     });
     initShortcuts(dom, tabs);
@@ -52,14 +51,8 @@ async function main() {
         history.reset(dom.editor.value);
     };
 
-    const { onOpened: onOpenedWithLast } = await initLastFile(dom, state, {
-        applyOpenedFile,
-        onOpened,
-        tabs,
-        autoOpen: true
-    });
 
-    initOpenSave(dom, state, { onOpened: onOpenedWithLast, tabs: tabs });
+    initOpenSave(dom, state, { onOpened, tabs });
     initDragDrop(dom, state, { onOpened, tabs });
 }
 

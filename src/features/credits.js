@@ -5,7 +5,7 @@ export async function initCredits(dom, state, opts = {}) {
     const {
         author = "Nutcracker",
         sponsor = "ArasakaCorp",
-        url = "https://github.com/ArasakaCorp/CyberPad",
+        url = "https://github.com/ArasakaCorp/CyberPad-Rust-Tauri",
         productName = "CyberPad",
     } = opts;
 

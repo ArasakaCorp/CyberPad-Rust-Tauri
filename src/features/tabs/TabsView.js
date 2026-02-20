@@ -40,12 +40,16 @@ export function createTabsView(dom, state, { onClickTab, onDblClickTab } = {}) {
     }
 
     function mountInitial() {
+        dom.tabs.innerHTML = "";   // ← ОБЯЗАТЕЛЬНО
+
         const snap = state.getSnapshot();
+
         for (const tab of snap.tabs) {
             const btn = makeBtn(tab);
             byId.set(tab.id, btn);
             dom.tabs.appendChild(btn);
         }
+
         syncSelection();
     }
 

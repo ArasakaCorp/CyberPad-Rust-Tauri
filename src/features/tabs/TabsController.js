@@ -1,76 +1,256 @@
 // src/tabs/TabsController.js
+
 import { createTabState } from "./TabState.js";
 import { createTabsView } from "./TabsView.js";
 import { createHeaderView } from "./HeaderView.js";
+
 import { fileNameFromPath } from "../../ui/state.js";
 import { UIStrings } from "../../ui/UIStrings.js";
 
+import {
+    persistTabsSnapshot,
+    loadPersistedTabsSnapshot
+} from "./persistTabs.js";
+
+import { invoke } from "@tauri-apps/api/core";
+
+
+/* ----------------------------- */
+/* helpers                       */
+/* ----------------------------- */
 
 function uid() {
-    return Math.random().toString(16).slice(2) + Date.now().toString(16);
+    return Math.random().toString(16).slice(2)
+        + Date.now().toString(16);
 }
 
 function createEmptyTab() {
-    return { id: uid(), filePath: null, name: UIStrings.FILE_DEFAULT_NAME, content: "", dirty: false };
+    return {
+        id: uid(),
+        filePath: null,
+        name: UIStrings.FILE_DEFAULT_NAME,
+        content: "",
+        dirty: false,
+        _scratch: true,
+    };
 }
 
-export function initTabs(dom, legacyState, { autosave, onOpened } = {}) {
-    dom.tabs = dom.tabs || document.querySelector("#tabs");
 
-    // State (истина)
+/* ----------------------------- */
+/* restore                      */
+/* ----------------------------- */
+
+async function restoreTabsIntoLegacyState(legacyState) {
+
+    const saved = loadPersistedTabsSnapshot();
+
+    if (!saved?.tabs?.length) return;
+
+    const hydratedTabs = [];
+
+    for (const t of saved.tabs) {
+
+        let content = t.scratch ?? "";
+
+        if (t.filePath) {
+            try {
+                const res = await invoke("open_path", {
+                    path: t.filePath
+                });
+
+                if (res?.content != null)
+                    content = res.content;
+
+            } catch {
+                content = "";
+            }
+        }
+
+        hydratedTabs.push({
+            id: t.id,
+            filePath: t.filePath,
+            name:
+                t.name ??
+                (t.filePath
+                    ? fileNameFromPath(t.filePath)
+                    : UIStrings.FILE_DEFAULT_NAME),
+
+            content,
+            dirty: false,
+            _scratch: false,
+        });
+    }
+
+    legacyState.tabs = hydratedTabs;
+
+    legacyState.activeTabId =
+        saved.activeId &&
+        hydratedTabs.some(t => t.id === saved.activeId)
+            ? saved.activeId
+            : hydratedTabs[0]?.id ?? null;
+}
+
+
+/* ----------------------------- */
+/* controller                   */
+/* ----------------------------- */
+
+export async function initTabs(
+    dom,
+    legacyState,
+    { autosave, onOpened } = {}
+) {
+
+    dom.tabs ||= document.querySelector("#tabs");
+
+
+    /* ------------------------- */
+    /* restore                  */
+    /* ------------------------- */
+
+    await restoreTabsIntoLegacyState(legacyState);
+
+
+    /* ------------------------- */
+    /* state                    */
+    /* ------------------------- */
+
     const state = createTabState({
         tabs: legacyState.tabs ?? [],
         activeId: legacyState.activeTabId ?? null,
     });
 
-    state.ensureAtLeastOne(createEmptyTab);
+    if (!state.getSnapshot().tabs.length) {
+
+        const tab = createEmptyTab();
+
+        state.addFront(tab);
+        state.setActive(tab.id);
+    }
+
+
+    /* ------------------------- */
+    /* persistence              */
+    /* ------------------------- */
+
+    let persistTimer = null;
+
+    function schedulePersist() {
+
+        clearTimeout(persistTimer);
+
+        persistTimer = setTimeout(() => {
+            persistTabsSnapshot(state);
+        }, 400);
+    }
+
+    state.subscribe(type => {
+
+        if (type === "hover:changed")
+            return;
+
+        if (type === "tabs:removed") {
+            persistTabsSnapshot(state);
+            return;
+        }
+
+        schedulePersist();
+    });
+
+    function flushPersistNow() {
+        try {
+            persistTabsSnapshot(state);
+        } catch {}
+    }
+
+    window.addEventListener("pagehide", flushPersistNow);
+    window.addEventListener("beforeunload", flushPersistNow);
+
+
+    /* ------------------------- */
+    /* editor sync              */
+    /* ------------------------- */
 
     function persistActiveContent() {
+
         const active = state.getActive();
-        if (active) active.content = dom.editor.value;
+
+        if (active)
+            active.content = dom.editor.value;
     }
 
     function applyActiveToEditor() {
+
         const active = state.getActive();
-        dom.editor.value = active?.content ?? "";
-        legacyState.currentFilePath = active?.filePath ?? null;
-        legacyState.dirty = !!active?.dirty;
+
+        if (!active) return;
+
+        if (dom.editor.value !== active.content)
+            dom.editor.value = active.content ?? "";
+
+        legacyState.currentFilePath = active.filePath ?? null;
+        legacyState.dirty = !!active.dirty;
         legacyState.activeTabId = state.getSnapshot().activeId;
-        autosave?.resetAutosaveForTab?.(active?.id);
+
+        autosave?.resetAutosaveForTab?.(active.id);
+
         dom.__updateCharCount?.();
     }
 
+
+    /* ------------------------- */
+    /* tab lifecycle            */
+    /* ------------------------- */
+
     function switchToTab(tabId) {
+
         persistActiveContent();
+
         const next = state.getTab(tabId);
+
         if (!next) return;
+
         state.setActive(next.id);
+
         applyActiveToEditor();
     }
 
     function closeTab(tabId, { force = false } = {}) {
+
         const tab = state.getTab(tabId);
+
         if (!tab) return;
 
         if (tab.dirty && !force) {
-            // твой “flash saved” можно оставить
+
             dom.topFile.classList.add("saved");
-            setTimeout(() => dom.topFile.classList.remove("saved"), 200);
+
+            setTimeout(
+                () => dom.topFile.classList.remove("saved"),
+                200
+            );
+
             return;
         }
 
         const snap = state.getSnapshot();
-        const wasActive = tabId === snap.activeId;
+
+        const wasActive =
+            tabId === snap.activeId;
 
         state.remove(tabId);
 
         const after = state.getSnapshot();
+
         if (!after.tabs.length) {
-            const t = createEmptyTab();
-            state.addFront(t);
-            state.setActive(t.id);
+
+            const tab = createEmptyTab();
+
+            state.addFront(tab);
+            state.setActive(tab.id);
+
         } else if (wasActive) {
-            // выберем следующий “слева”, но у нас порядок массива
+
             state.setActive(after.tabs[0].id);
         }
 
@@ -78,92 +258,89 @@ export function initTabs(dom, legacyState, { autosave, onOpened } = {}) {
     }
 
     function openPayloadInNewTab(res) {
-        const filePath = res?.filePath ?? res?.file_path ?? null;
-        const content = res?.content ?? "";
-        const name = filePath ? fileNameFromPath(filePath) : UIStrings.FILE_DEFAULT_NAME;
+
+        const filePath =
+            res?.filePath ??
+            res?.file_path ??
+            null;
+
+        const content =
+            res?.content ?? "";
+
+        const name =
+            filePath
+                ? fileNameFromPath(filePath)
+                : UIStrings.FILE_DEFAULT_NAME;
 
         const snap = state.getSnapshot();
         const active = state.getActive();
 
-        // reuse empty
+
+        // reuse scratch tab
+
         if (
             snap.tabs.length === 1 &&
             active &&
-            !active.filePath &&
-            !active.dirty &&
-            !active.content
+            active.filePath === null &&
+            active.content === "" &&
+            active.dirty === false
         ) {
-            state.update(active.id, { filePath, name, content, dirty: false });
+
+            state.update(active.id, {
+                filePath,
+                name,
+                content,
+                dirty: false,
+            });
+
             state.setActive(active.id);
+
             applyActiveToEditor();
+
             onOpened?.(active);
+
             return active;
         }
 
-        const tab = { id: uid(), filePath, name, content, dirty: false };
+
+        const tab = {
+            id: uid(),
+            filePath,
+            name,
+            content,
+            dirty: false,
+        };
+
         state.addFront(tab);
         state.setActive(tab.id);
+
         applyActiveToEditor();
 
         onOpened?.(tab);
+
         return tab;
     }
 
     function newTab() {
-        const t = createEmptyTab();
-        state.addFront(t);
-        state.setActive(t.id);
+
+        const tab = createEmptyTab();
+
+        state.addFront(tab);
+        state.setActive(tab.id);
+
         applyActiveToEditor();
-        return t;
+
+        return tab;
     }
 
-    // Views
-    const headerView = createHeaderView(dom, state);
-    const tabsView = createTabsView(dom, state, {
-        onClickTab: switchToTab,
-        onDblClickTab: (id) => closeTab(id),
-    });
-
-    tabsView.mountInitial();
-    applyActiveToEditor();
-
-    // editor dirty tracking (обновляем таб и legacy)
-    dom.editor.addEventListener("input", () => {
-        const active = state.getActive();
-        if (!active) return;
-        active.dirty = true;
-        legacyState.dirty = true;
-        legacyState.currentFilePath = active.filePath ?? null;
-    });
-
-    return {
-        getActiveTab: () => state.getActive(),
-        getAllTabs: () => state.getSnapshot().tabs,
-
-        switchToTab,
-        closeTab,
-        openPayloadInNewTab,
-        newTab,
-        applySavedPath,
-
-
-        markClean() {
-            const active = state.getActive();
-            if (active) active.dirty = false;
-            legacyState.dirty = false;
-        },
-
-        destroy() {
-            headerView.destroy();
-            tabsView.destroy();
-        },
-    };
-
     function applySavedPath(filePath) {
+
         const active = state.getActive();
+
         if (!active) return;
 
         state.update(active.id, {
+
             filePath,
             name: fileNameFromPath(filePath),
             dirty: false,
@@ -175,4 +352,80 @@ export function initTabs(dom, legacyState, { autosave, onOpened } = {}) {
 
         autosave?.resetAutosaveForTab?.(active.id);
     }
+
+
+    /* ------------------------- */
+    /* views                    */
+    /* ------------------------- */
+
+    const headerView =
+        createHeaderView(dom, state);
+
+    const tabsView =
+        createTabsView(dom, state, {
+
+            onClickTab: switchToTab,
+            onDblClickTab: id => closeTab(id),
+        });
+
+    tabsView.mountInitial();
+
+    applyActiveToEditor();
+
+
+    dom.editor.addEventListener("input", () => {
+
+        const active = state.getActive();
+
+        if (!active) return;
+
+        state.update(active.id, {
+            content: dom.editor.value,
+            dirty: true,
+        });
+
+        legacyState.dirty = true;
+        legacyState.currentFilePath =
+            active.filePath ?? null;
+    });
+
+
+    /* ------------------------- */
+    /* public API               */
+    /* ------------------------- */
+
+    return {
+
+        getActiveTab: () => state.getActive(),
+
+        getAllTabs: () =>
+            state.getSnapshot().tabs,
+
+        switchToTab,
+
+        closeTab,
+
+        openPayloadInNewTab,
+
+        newTab,
+
+        applySavedPath,
+
+        markClean() {
+
+            const active = state.getActive();
+
+            if (active)
+                active.dirty = false;
+
+            legacyState.dirty = false;
+        },
+
+        destroy() {
+
+            headerView.destroy();
+
+            tabsView.destroy();
+        },
+    };
 }
