@@ -1,3 +1,4 @@
+
 :root{
     --bg: #070b10;
     --panel: rgba(8, 16, 22, 0.66);
@@ -193,12 +194,6 @@ html, body{
 
 .header-actions{
     display:flex;
-    gap: 8px;
-    align-items:center;
-}
-
-.header-actions{
-    display:flex;
     gap: 10px;              /* одинаковый отступ между */
     align-items:center;
     padding-right: 2px;     /* чтобы не липло к краю */
@@ -293,9 +288,8 @@ textarea{
     letter-spacing: 0.04em;;
     line-height: 1.5;
     caret-color: rgba(51,214,255,1);
-
-    text-shadow: 0 0 18px rgba(51,214,255,0.12);
 }
+
 textarea::placeholder{
     color: rgba(51,214,255,0.30);
     text-shadow: none;
@@ -725,99 +719,129 @@ textarea{
     border-bottom-color: rgba(51,214,255,0.9);
 }
 
-/* --- TAB STRIP (HUD slots) --- */
+/* ======================================================================
+   TAB STRIP
+   ====================================================================== */
+
 .tabstrip{
     position: relative;
     padding: 0 14px 4px 14px;
-    border-bottom: 0;
     background: rgba(0,0,0,0.02);
     margin-top: -3px;
 }
+
 .tabs{
-    display: flex;         /* ✅ вернуть */
-    align-items: center;
-    gap: 6px;              /* ✅ вернуть */
-    height: 10px;          /* физическая зона */
+    display:flex;
+    align-items:center;
+    gap: 6px;
+    height: 10px;
 }
 
-/* button reset + reliable rendering */
+/* Tab slot button geometry */
 .tab{
+    position: relative;
     flex: 1;
-    height: 10px;          /* ✅ hitbox */
+    height: 10px;
     padding: 0;
     margin: 0;
     border: 0;
     background: transparent;
-    cursor: pointer;
     outline: none;
-    position: relative;    /* для псевдоэлемента */
-    opacity: 0.55;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
 }
 
-/* the 1px visible line lives inside */
-.tab::after{
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 50%;
-    height: 1px;           /* ✅ visual thickness */
-    transform: translateY(-50%);
-    border-radius: 999px;
+/* Tab line */
+.tab::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:50%;
+    height:1px;
+    width:100%;
+    transform: translateY(-50%) scaleX(1);
+    transform-origin: left center;
+    border-radius:999px;
+
     background: rgba(51,214,255,0.12);
+    opacity: 0.55;
     box-shadow: 0 0 10px rgba(51,214,255,0.06);
-    pointer-events: none;  /* ✅ hover/click stays on button */
 }
 
-.tab:hover{
-    opacity: 0.9;
-}
-
-.tab:hover::after{
+/* hover/active style only */
+.tab:hover::before{
     background: rgba(51,214,255,0.22);
+    opacity: 0.9;
     box-shadow: 0 0 16px rgba(51,214,255,0.12);
 }
 
-.tab[aria-selected="true"]{
-    opacity: 1;
-}
-
-.tab[aria-selected="true"]::after{
+.tab[aria-selected="true"]::before{
     background: rgba(51,214,255,0.45);
+    opacity: 1;
     box-shadow: 0 0 22px rgba(51,214,255,0.20);
 }
 
-.tab.tab-dim{
-    opacity: 0.22;
+/* enter animation: transform-only (stable, compositor-friendly) */
+.tab.tab-enter::before{
+    transform: translateY(-50%) scaleX(0);
+    transition: transform 220ms ease-out;
+}
+.tab.tab-enter.tab-enter-active::before{
+    transform: translateY(-50%) scaleX(1);
 }
 
-/* hover preview animation */
-.header-value.tab-preview-enter{
-    animation: tabPreviewEnter 120ms cubic-bezier(.22,.61,.36,1);
+/* ======================================================================
+   HEADER: layered title (no blink)
+   ====================================================================== */
+/* Keep header single-line always */
+#topFile{
+    position: relative;
+    display: block;          /* чтобы нормально занимал ширину */
+    min-width: 0;
+    white-space: nowrap;     /* НИКОГДА не переносим */
+    overflow: hidden;
 }
 
-.header-value.tab-preview-leave{
-    animation: tabPreviewLeave 100ms ease;
+/* SAVED overlay */
+#topFile.saved::after{
+    content: attr(data-saved-text);
+    position: absolute;
+    inset: 0;                /* поверх всего текста */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+
+    opacity: 1;
+    pointer-events: none;
 }
 
-@keyframes tabPreviewEnter{
-    from{
-        transform: translateY(-6px);
-        opacity: 0;
-    }
-    to{
-        transform: translateY(0);
-        opacity: 1;
-    }
+/* Hide underlying layers while SAVED is shown */
+#topFile.saved .top-file-active,
+#topFile.saved .top-file-preview{
+    opacity: 0;
+}
+/* Preview overlays active */
+#topFile .top-file-preview{
+    position: absolute;
+    inset: 0;
+    white-space: nowrap;
+    overflow: hidden;
+
+    opacity: 0;
+    transition: opacity 140ms ease;
+    pointer-events: none;
+}
+#topFile .top-file-preview.is-on{ opacity: 1; }
+
+#topFile.saved::after{
+    content: attr(data-saved-text);
 }
 
-@keyframes tabPreviewLeave{
-    from{
-        transform: translateY(6px);
-        opacity: 0;
-    }
-    to{
-        transform: translateY(0);
-        opacity: 1;
-    }
+#topFile.is-preview .top-file-active{
+    opacity: 0;
+    transition: opacity 140ms ease;
+}
+#topFile .top-file-active{
+    transition: opacity 140ms ease;
 }

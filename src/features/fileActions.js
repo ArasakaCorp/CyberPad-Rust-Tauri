@@ -2,6 +2,8 @@ import { fileNameFromPath } from "../ui/state.js";
 import { updateCharCount } from "./counter.js";
 import { closeDrawer } from "./drawer.js";
 import { invoke } from "@tauri-apps/api/core"; // если v1, будет "@tauri-apps/api/tauri"
+import { UIStrings } from "../ui/UIStrings.js";
+
 
 export function syncSaveState(dom, state) {
     // Save is always available; Save As is always available.
@@ -26,16 +28,12 @@ export function applyOpenedFile(dom, state, res) {
 }
 
 export function showSavedIndicator(dom) {
-    // cancel previous timer if user saves quickly
     if (dom.__savedTimer) clearTimeout(dom.__savedTimer);
 
-    const original = dom.topFile.dataset.fileName || dom.topFile.textContent || "NOTE.txt";
-
-    dom.topFile.textContent = "SAVED";
+    dom.topFile.dataset.savedText = UIStrings.STATUS_SAVED;
     dom.topFile.classList.add("saved");
 
     dom.__savedTimer = setTimeout(() => {
-        dom.topFile.textContent = original;
         dom.topFile.classList.remove("saved");
         dom.__savedTimer = null;
     }, 700);
@@ -53,15 +51,18 @@ export function initOpenSave(dom, state, { onOpened , tabs}) {
         const res = await invoke("open_file_dialog");
         if (!res) return;
 
-        const tab = tabs ? tabs.openPayloadInNewTab(res) : (applyOpenedFile(dom, state, res), null);
+        const tab = tabs.openPayloadInNewTab(res);
         onOpened?.(tab?.filePath ?? res.filePath);
     });
 
     dom.menuSave.addEventListener("click", async () => {
         closeDrawer(dom);
 
-        // Save behaves like Save As if we don't have a target path yet
-        if (!state.currentFilePath) {
+        // If tabs exist, save active tab path or fallback to Save As
+        const activeTab = tabs?.getActiveTab?.();
+
+        const path = activeTab?.filePath ?? state.currentFilePath;
+        if (!path) {
             dom.menuSaveAs.click();
             return;
         }
@@ -70,11 +71,16 @@ export function initOpenSave(dom, state, { onOpened , tabs}) {
 
         try {
             const res = await invoke("save_file", {
-                path: state.currentFilePath,
+                path,
                 content: dom.editor.value,
             });
 
             if (res?.ok) {
+                // mark clean in BOTH systems
+                if (tabs) {
+                    // best: controller should expose markClean() already
+                    tabs.markClean?.();
+                }
                 state.dirty = false;
                 showSavedIndicator(dom);
             }
@@ -87,9 +93,11 @@ export function initOpenSave(dom, state, { onOpened , tabs}) {
     dom.menuSaveAs.addEventListener("click", async () => {
         closeDrawer(dom);
 
-        const suggestedName = state.currentFilePath
-            ? fileNameFromPath(state.currentFilePath)
-            : "NOTE.txt";
+        const activeTab = tabs?.getActiveTab?.();
+
+        const suggestedName = (activeTab?.filePath ?? state.currentFilePath)
+            ? fileNameFromPath(activeTab?.filePath ?? state.currentFilePath)
+            : UIStrings.FILE_DEFAULT_NAME;
 
         dom.menuSaveAs.disabled = true;
 
@@ -100,19 +108,22 @@ export function initOpenSave(dom, state, { onOpened , tabs}) {
             });
 
             if (!res?.filePath) return;
-            if (tabs) {
-                const active = tabs.getActiveTab();
-                if (active) {
-                    active.filePath = res.filePath;
-                    active.name = fileNameFromPath(res.filePath);
-                    active.content = dom.editor.value;
-                    active.dirty = false;
 
-                    tabs.render(); // обновить полоски
-                }
+            if (tabs) {
+                // ✅ НУЖЕН метод applySavedPath в TabsController (см. ниже)
+                tabs.applySavedPath?.(res.filePath);
+
+                // если applySavedPath ещё не сделал, временный костыль:
+                // activeTab.filePath = res.filePath; activeTab.name = fileNameFromPath(res.filePath);
+                // tabs._forceSync?.(); // но лучше не надо
+                tabs.markClean?.();
+            } else {
+                applyOpenedFile(dom, state, { filePath: res.filePath, content: dom.editor.value });
             }
 
-            applyOpenedFile(dom, state, { filePath: res.filePath, content: dom.editor.value });
+            state.currentFilePath = res.filePath;
+            state.dirty = false;
+
             showSavedIndicator(dom);
             onOpened?.(res.filePath);
         } finally {
@@ -124,13 +135,18 @@ export function initOpenSave(dom, state, { onOpened , tabs}) {
 
     // dirty tracking (базовое)
     dom.editor.addEventListener("input", () => {
-        if (!state.currentFilePath) return;
         state.dirty = true;
         syncSaveState(dom, state);
     });
 
     dom.menuNew.addEventListener("click", () => {
         closeDrawer(dom);
+        if (tabs) {
+            tabs.newTab();
+            syncSaveState(dom, state);
+            return;
+        }
+
         newNote(dom, state);
     });
 
@@ -140,8 +156,8 @@ export function initOpenSave(dom, state, { onOpened , tabs}) {
         state.dirty = false;
 
         // UI
-        dom.topFile.textContent = "NOTE.txt";
-        dom.topFile.dataset.fileName = "NOTE.txt";
+        dom.topFile.textContent = UIStrings.FILE_DEFAULT_NAME;
+        dom.topFile.dataset.fileName = UIStrings.FILE_DEFAULT_NAME;
         dom.editor.value = "";
         updateCharCount(dom);
 

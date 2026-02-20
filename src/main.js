@@ -15,7 +15,7 @@ import { initHistory } from "./features/history.js";
 import { initDragDrop } from "./features/dragDrop.js";
 import { initCredits } from "./features/credits.js";
 import { initLastFile } from "./features/lastFile.js";
-import { initTabs, } from "./features/tabs.js";
+import { initTabs } from "./features/tabs/TabsController.js";
 
 async function main() {
     const root = document.querySelector("#app");

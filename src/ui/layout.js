@@ -13,7 +13,7 @@ export function renderLayout(root) {
         <header class="header drag">
           <div class="header-title">
             <span class="chip-icon"><img src="${iconUrl}" alt=""></span>
-            <span id="topFile" class="header-value">NOTE.txt</span>
+            <span id="topFile" class="header-value"></span>
           </div>
 
           <div class="header-actions no-drag">
@@ -24,15 +24,6 @@ export function renderLayout(root) {
         
         <div class="tabstrip no-drag" aria-label="Tabs">
           <div class="tabs" id="tabs" role="tablist" aria-hidden="true">
-<!--            <button class="tab" type="button" role="tab" aria-selected="true" title="NOTE.txt"></button>-->
-<!--                        <button class="tab" type="button" role="tab" aria-selected="false" title="untitled-2.txt"></button>-->
-
-<!--            <button class="tab" type="button" role="tab" aria-selected="false" title="untitled-2.txt"></button>-->
-<!--            <button class="tab" type="button" role="tab" aria-selected="false" title="untitled-2.txt"></button>-->
-<!--            <button class="tab" type="button" role="tab" aria-selected="false" title="untitled-2.txt"></button>-->
-<!--            <button class="tab" type="button" role="tab" aria-selected="false" title="untitled-2.txt"></button>-->
-
-<!--            <button class="tab tab-dim" type="button" role="tab" aria-selected="false" title="log.sql"></button>-->
           </div>
           <div class="tabstrip-line" aria-hidden="true"></div>
         </div>
