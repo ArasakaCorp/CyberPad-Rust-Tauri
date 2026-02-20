@@ -791,3 +791,33 @@ textarea{
     opacity: 0.22;
 }
 
+/* hover preview animation */
+.header-value.tab-preview-enter{
+    animation: tabPreviewEnter 120ms cubic-bezier(.22,.61,.36,1);
+}
+
+.header-value.tab-preview-leave{
+    animation: tabPreviewLeave 100ms ease;
+}
+
+@keyframes tabPreviewEnter{
+    from{
+        transform: translateY(-6px);
+        opacity: 0;
+    }
+    to{
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes tabPreviewLeave{
+    from{
+        transform: translateY(6px);
+        opacity: 0;
+    }
+    to{
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

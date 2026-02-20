@@ -1,17 +1,51 @@
 // shortcuts.js
 
 /**
+ * Tracks Alt state manually.
+ * Required because Windows sends ArrowLeft/Right without altKey=true.
+ */
+let altPressed = false;
+
+/**
  * Initialize global keyboard shortcuts for the app.
  * Keeps init clean: all logic lives in dedicated handlers.
  */
-export function initShortcuts(dom) {
+export function initShortcuts(dom, tabs) {
+
+    if (!dom) {
+        console.warn("Shortcuts: dom missing");
+        return;
+    }
+
     window.addEventListener("keydown", (e) => {
-        // Order matters: most "dangerous" first
+        if (e.code === "AltLeft" || e.code === "AltRight") {
+            altPressed = true;
+            return;
+        }
+
         if (handleBlockRefresh(e)) return;
+
+        if (tabs && handleNextTabShortcut(e, tabs)) return;
+        if (tabs && handlePrevTabShortcut(e, tabs)) return;
+        if (tabs && handleCloseTabShortcut(e, tabs)) return;
+        if (tabs && handleNewTabShortcut(e, dom, tabs)) return;
+
+        if (handleOpenShortcut(e, dom)) return;
+
         if (handleSaveShortcut(e, dom)) return;
         if (handleSaveAsShortcut(e, dom)) return;
+
         if (handleTabInsertion(e, dom)) return;
-    });
+
+    }, { capture: true });
+
+    window.addEventListener("keyup", (e) => {
+
+        if (e.code === "AltLeft" || e.code === "AltRight") {
+            altPressed = false;
+        }
+
+    }, true);
 }
 
 /* =========================
@@ -151,4 +185,113 @@ function insertTextIntoContentEditable(text) {
     // execCommand is deprecated but still widely supported in webviews.
     // If you later move to a custom editor engine, replace this.
     document.execCommand("insertText", false, text);
+}
+
+/**
+ * New tab shortcut (Mod+N).
+ * Uses tabs API if available, falls back to UI button.
+ */
+function handleNewTabShortcut(e, dom, tabs) {
+    const key = keyOf(e);
+    const mod = isModPressed(e);
+
+    const isNewTab = mod && key === "n";
+    if (!isNewTab) return false;
+
+    e.preventDefault();
+
+    if (tabs?.newTab) {
+        tabs.newTab();
+    } else {
+        // fallback (legacy behavior)
+        dom.menuNew?.click();
+    }
+
+    return true;
+}
+
+/**
+ * Open file shortcut (Mod+O).
+ * Delegates to UI open button to keep logic centralized.
+ */
+function handleOpenShortcut(e, dom) {
+    const key = keyOf(e);
+    const mod = isModPressed(e);
+
+    const isOpen = mod && key === "o";
+    if (!isOpen) return false;
+
+    e.preventDefault();
+    dom.menuOpen?.click();
+
+    return true;
+}
+
+/**
+ * Close active tab (Mod+W).
+ */
+function handleCloseTabShortcut(e, tabs) {
+    const key = keyOf(e);
+    const mod = isModPressed(e);
+
+    if (!(mod && key === "w")) return false;
+
+    e.preventDefault();
+
+    const active = tabs?.getActiveTab?.();
+    if (!active) return true;
+
+    tabs.closeTab?.(active.id);
+
+    return true;
+}
+
+/**
+ * Switch to next tab (Alt+Right).
+ * Uses e.code for layout-independent detection.
+ */
+function handleNextTabShortcut(e, tabs) {
+
+    if (!altPressed) return false;
+    if (e.code !== "ArrowRight") return false;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    switchRelativeTab(tabs, +1);
+
+    return true;
+}
+
+/**
+ * Switch to previous tab (Alt+Left).
+ */
+function handlePrevTabShortcut(e, tabs) {
+
+    if (!altPressed) return false;
+    if (e.code !== "ArrowLeft") return false;
+
+    e.preventDefault();
+    e.stopPropagation();
+
+    switchRelativeTab(tabs, -1);
+
+    return true;
+}
+
+/**
+ * Switch tab relative to current index.
+ */
+function switchRelativeTab(tabs, delta) {
+    const list = tabs?.getAllTabs?.();
+    const active = tabs?.getActiveTab?.();
+
+    if (!list?.length || !active) return;
+
+    const idx = list.findIndex(t => t.id === active.id);
+    if (idx === -1) return;
+
+    const nextIdx = (idx + delta + list.length) % list.length;
+
+    tabs.switchToTab?.(list[nextIdx].id);
 }

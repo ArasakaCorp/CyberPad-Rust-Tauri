@@ -15,7 +15,7 @@ import { initHistory } from "./features/history.js";
 import { initDragDrop } from "./features/dragDrop.js";
 import { initCredits } from "./features/credits.js";
 import { initLastFile } from "./features/lastFile.js";
-import { initTabs } from "./features/tabs.js";
+import { initTabs, } from "./features/tabs.js";
 
 async function main() {
     const root = document.querySelector("#app");
@@ -32,20 +32,18 @@ async function main() {
     initCounter(dom);
     dom.__updateCharCount = () => updateCharCount(dom);
 
-    initShortcuts(dom);
-    initCredits(dom, state);
+    await initCredits(dom, state);
+    await initRecent(dom, state);
 
-    initRecent(dom, state);
+    const tabs = initTabs(dom, state, {
+        onOpened: tab => pushRecent(dom, tab.filePath)
+    });
+    initShortcuts(dom, tabs);
 
     const autosave = initAutosave(dom, state, {
         debounceMs: 1200,
-        intervalMs: 20000
-    });
-
-    const tabs = initTabs(dom, state, {
-        onOpened: (tab) => {
-            // сюда можно later воткнуть history.reset/tab-specific history
-        },
+        intervalMs: 20000,
+        tabs,
     });
 
     const onOpened = (filePath) => {
@@ -62,7 +60,7 @@ async function main() {
     });
 
     initOpenSave(dom, state, { onOpened: onOpenedWithLast, tabs: tabs });
-    initDragDrop(dom, state, { onOpened: onOpenedWithLast });
+    initDragDrop(dom, state, { onOpened, tabs });
 }
 
 main();
