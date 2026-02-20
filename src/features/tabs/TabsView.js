@@ -9,10 +9,27 @@ export function createTabsView(dom, state, { onClickTab, onDblClickTab } = {}) {
         btn.setAttribute("role", "tab");
         btn.title = tab.name || UIStrings.FILE_DEFAULT_NAME;
 
-        btn.addEventListener("mouseenter", () => state.setHover(tab.id));
+        btn.addEventListener("mouseenter", () => {
+            const { activeId, hoverId } = state.getSnapshot();
+
+            // не запускаем hover на активной вкладке
+            if (tab.id === activeId) return;
+
+            // если hover уже на ней, не дёргаем
+            if (hoverId === tab.id) return;
+
+            state.setHover(tab.id);
+        });
+
         btn.addEventListener("mouseleave", () => {
+            const { activeId } = state.getSnapshot();
+
+            // для активной вкладки hover мы не ставили
+            if (tab.id === activeId) return;
+
             // если курсор уже на другом табе, не скидываем hover
             if (dom.tabs.querySelector(".tab:hover")) return;
+
             state.setHover(null);
         });
 

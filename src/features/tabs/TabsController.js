@@ -215,6 +215,22 @@ export async function initTabs(
         applyActiveToEditor();
     }
 
+    function showUnsavedCloseBlocked(dom) {
+        if (!dom?.topFile) return;
+
+        clearTimeout(dom.__unsavedTimer);
+
+        dom.topFile.classList.remove("unsaved");
+        void dom.topFile.offsetWidth; // reflow
+        dom.topFile.classList.add("unsaved");
+
+        console.log("UNSAVED flash", dom.topFile?.id, dom.topFile?.className);
+
+        dom.__unsavedTimer = setTimeout(() => {
+            dom.topFile.classList.remove("unsaved");
+        }, 240);
+    }
+
     function closeTab(tabId, { force = false } = {}) {
 
         const tab = state.getTab(tabId);
@@ -222,15 +238,8 @@ export async function initTabs(
         if (!tab) return;
 
         if (tab.dirty && !force) {
-
-            dom.topFile.classList.add("saved");
-
-            setTimeout(
-                () => dom.topFile.classList.remove("saved"),
-                200
-            );
-
-            return;
+            showUnsavedCloseBlocked(dom);
+            return false;
         }
 
         const snap = state.getSnapshot();
@@ -373,20 +382,25 @@ export async function initTabs(
     applyActiveToEditor();
 
 
+
     dom.editor.addEventListener("input", () => {
-
         const active = state.getActive();
-
         if (!active) return;
 
+        const content = dom.editor.value;
+
+        const isScratch = !active.filePath;
+        const shouldBeDirty = isScratch
+            ? content.trim().length > 0
+            : true;
+
         state.update(active.id, {
-            content: dom.editor.value,
-            dirty: true,
+            content,
+            dirty: shouldBeDirty,
         });
 
-        legacyState.dirty = true;
-        legacyState.currentFilePath =
-            active.filePath ?? null;
+        legacyState.dirty = shouldBeDirty;
+        legacyState.currentFilePath = active.filePath ?? null;
     });
 
 

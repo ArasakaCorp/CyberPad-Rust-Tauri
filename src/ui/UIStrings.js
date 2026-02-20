@@ -12,6 +12,7 @@ export const UIStrings = Object.freeze({
 
     // Status indicators
     STATUS_SAVED: "SAVED",
+    STATUS_UNSAVED: "UNSAVED",
     STATUS_AUTO: "AUTO",
     STATUS_AUTO_SAVING: "AUTO…",
     STATUS_AUTO_SAVED: "AUTO•",

@@ -171,7 +171,6 @@ html, body{
 
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 /* Иконка “чипа” рядом с заголовком */
@@ -540,41 +539,6 @@ textarea{
     user-select:none;
 }
 
-/* временный статус сохранения */
-.header-value.saved{
-    color: var(--success);
-    text-shadow:
-            0 0 6px color-mix(in srgb, var(--success) 80%, transparent),
-            0 0 18px color-mix(in srgb, var(--success) 60%, transparent),
-            0 0 32px color-mix(in srgb, var(--success) 40%, transparent);
-
-    letter-spacing: 0.35em;
-
-    animation: savedFlash 700ms ease;
-}
-
-@keyframes savedFlash{
-    0%   { opacity:0; transform: translateY(-2px); }
-    30%  { opacity:1; }
-    100% { opacity:1; }
-}
-
-.header.saved::after{
-    content:"";
-    position:absolute;
-    left:0;
-    right:0;
-    bottom:-1px;
-    height:2px;
-    background: linear-gradient(90deg, transparent, #33ffcc, transparent);
-    animation: scan 600ms ease;
-}
-
-@keyframes scan{
-    from { transform: translateX(-100%); }
-    to   { transform: translateX(100%); }
-}
-
 .char-status {
     position: absolute;
     right: 65px;
@@ -659,7 +623,6 @@ textarea{
     letter-spacing: 0.02em;
     opacity: 0.55;
     overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
@@ -702,7 +665,6 @@ textarea{
 
     white-space: nowrap;      /* 🔥 ключевое */
     overflow: hidden;
-    text-overflow: ellipsis;  /* если не помещается — аккуратно обрежет */
 
     display: block;
 }
@@ -798,22 +760,70 @@ textarea{
 #topFile{
     position: relative;
     display: block;          /* чтобы нормально занимал ширину */
+    flex: 1;
     min-width: 0;
     white-space: nowrap;     /* НИКОГДА не переносим */
     overflow: hidden;
 }
 
+/* КЛЮЧ: когда включен preview (hover таба) — разрешаем вылезать */
+#topFile.is-preview{
+    overflow: visible;
+    z-index: 50;          /* поверх внутри header */
+}
+
+/* и сам preview слой делаем шириной по контенту */
+#topFile .top-file-preview{
+    width: max-content;
+    max-width: none;
+    right: auto;          /* чтобы inset не зажимал */
+    overflow: visible;    /* не режь */
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* когда preview включен */
+#topFile .top-file-preview.is-on{ opacity: 1; }
+
+/* SAVED overlay */
 /* SAVED overlay */
 #topFile.saved::after{
     content: attr(data-saved-text);
     position: absolute;
-    inset: 0;                /* поверх всего текста */
+    inset: 0;
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
-
-    opacity: 1;
     pointer-events: none;
+
+    color: var(--success);
+    text-shadow:
+            0 0 6px color-mix(in srgb, var(--success) 80%, transparent),
+            0 0 18px color-mix(in srgb, var(--success) 60%, transparent),
+            0 0 32px color-mix(in srgb, var(--success) 40%, transparent);
+
+    letter-spacing: 0.35em;
+    animation: savedFlash 700ms ease;
+}
+
+#topFile.unsaved{
+    color: rgba(255, 90, 90, 0.98);
+    text-shadow:
+            0 0 8px rgba(255, 80, 80, 0.45),
+            0 0 22px rgba(255, 80, 80, 0.22);
+
+    animation: topFileShake 220ms ease-in-out;
+    will-change: transform;
+}
+
+@keyframes topFileShake{
+    0%   { transform: translateX(0); }
+    12%  { transform: translateX(-1px); }
+    24%  { transform: translateX(2px); }
+    36%  { transform: translateX(-2px); }
+    48%  { transform: translateX(2px); }
+    60%  { transform: translateX(-1px); }
+    72%  { transform: translateX(1px); }
+    100% { transform: translateX(0); }
 }
 
 /* Hide underlying layers while SAVED is shown */
@@ -821,6 +831,7 @@ textarea{
 #topFile.saved .top-file-preview{
     opacity: 0;
 }
+
 /* Preview overlays active */
 #topFile .top-file-preview{
     position: absolute;
@@ -833,10 +844,6 @@ textarea{
     pointer-events: none;
 }
 #topFile .top-file-preview.is-on{ opacity: 1; }
-
-#topFile.saved::after{
-    content: attr(data-saved-text);
-}
 
 #topFile.is-preview .top-file-active{
     opacity: 0;
