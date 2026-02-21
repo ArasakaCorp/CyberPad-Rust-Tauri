@@ -11,7 +11,7 @@ import { initShortcuts } from "./features/shortcuts.js";
 import { initWindowButtons, initOpenSave, applyOpenedFile } from "./features/fileActions.js";
 import { initAutosave } from "./features/autosave.js";
 import { initRecent, pushRecent } from "./features/recentFiles.js";
-import { initHistory } from "./features/history.js";
+import { initHistory } from "./features//history/history.js";
 import { initDragDrop } from "./features/dragDrop.js";
 import { initCredits } from "./features/credits.js";
 import { initTabs } from "./features/tabs/TabsController.js";
@@ -23,8 +23,7 @@ async function main() {
 
     const dom = getDom();
     const state = createState();
-    const history = initHistory(dom, state, { limit: 200, debounceMs: 300 });
-    history.reset("");
+
 
     initWindowButtons(dom);
     initDrawer(dom);
@@ -37,6 +36,12 @@ async function main() {
     const tabs = await initTabs(dom, state, {
         onOpened: tab => pushRecent(dom, tab.filePath)
     });
+
+    const history = initHistory(dom, tabs.__state, {
+        limit: 200,
+        debounceMs: 300,
+    });
+
     initShortcuts(dom, tabs);
 
     const autosave = initAutosave(dom, state, {

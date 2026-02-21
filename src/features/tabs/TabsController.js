@@ -410,6 +410,8 @@ export async function initTabs(
 
     return {
 
+        __state: state,
+
         getActiveTab: () => state.getActive(),
 
         getAllTabs: () =>
