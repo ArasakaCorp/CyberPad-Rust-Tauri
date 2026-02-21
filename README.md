@@ -2,26 +2,36 @@
 
 Minimalist industrial notepad for people who prefer terminals over toys.
 
-CyberPad is a lightweight, frameless, transparent **Tauri-based
-multi-tab editor** written in Rust and Vanilla JavaScript, designed to
+CyberPad is a lightweight, frameless, transparent **Tauri‑based
+multi‑tab editor** written in Rust and Vanilla JavaScript, designed to
 feel like a small system utility rather than a traditional application.
 
-Fast launch. Zero clutter. Keyboard-first. Persistent state. Native
+Fast launch. Zero clutter. Keyboard‑first. Persistent state. Native
 performance.
 
-Inspired by the **Memory Shards** interface from Cyberpunk 2077.
+Inspired by the **Memory Shards** interface from *Cyberpunk 2077* ---
+small, floating, diegetic data panels that feel like hardware rather
+than software.
 
 ------------------------------------------------------------------------
 
-# ✦ What's New (Tab Engine)
+# ✦ What's New --- Tab Engine
 
--   Multi-tab system with persistent state
--   Per-tab undo / redo history
--   Full tab session restore on launch
--   Per-tab autosave tracking
--   Persistent tab storage
--   Dirty tab protection
+CyberPad now includes a full tab engine with persistent state and
+isolated editor history.
+
+New capabilities:
+
+-   Multi‑tab system
+-   Per‑tab undo / redo history
+-   Persistent tab session restore
+-   Per‑tab autosave
+-   Dirty state tracking per tab
+-   Tab close protection
 -   Header preview system
+-   Persistent tab snapshots
+
+Each tab behaves like an independent editor instance.
 
 ------------------------------------------------------------------------
 
@@ -39,36 +49,39 @@ Inspired by the **Memory Shards** interface from Cyberpunk 2077.
 
 -   Unlimited tabs
 -   Independent content per tab
--   Independent history per tab
+-   Independent undo / redo history
 -   Persistent tabs on restart
 -   Dirty state tracking
--   Scratch tabs
+-   Scratch tabs supported
 
 ## File Operations
 
--   Open
+-   Open file
 -   Save
 -   Save As
 -   Drag & Drop
--   Recent files
+-   Recent files list
+-   Persistent recent history
 
 ## History Engine
 
--   Per-tab undo / redo
--   No cross-tab history corruption
+-   Per‑tab undo / redo stacks
+-   No cross‑tab history corruption
 -   Deterministic behavior
+-   Proper undo isolation
 
 ## Autosave
 
--   Per-tab autosave
+-   Per‑tab autosave
 -   Idle autosave
 -   Autosave indicator
 
 ## HUD Interface
 
 -   Cyberpunk Memory Shard UI
--   Header preview layers
--   Slide-out drawer
+-   Header preview system
+-   Layered title rendering
+-   Slide‑out drawer
 -   Character counter
 
 ------------------------------------------------------------------------
@@ -78,89 +91,90 @@ Inspired by the **Memory Shards** interface from Cyberpunk 2077.
 ## File
 
 Open file\
-Ctrl + O
+`Ctrl + O`
 
 Save\
-Ctrl + S
+`Ctrl + S`
 
 Save As\
-Ctrl + Shift + S
-
-------------------------------------------------------------------------
+`Ctrl + Shift + S`
 
 ## Tabs
 
 New tab\
-Ctrl + T
+`Ctrl + T`
 
 Close tab\
-Double click tab
+`Double‑click tab`
 
 Switch tab\
-Click tab
+`Click tab`
 
 Preview filename\
-Hover tab
-
-------------------------------------------------------------------------
+`Hover tab`
 
 ## Editing
 
 Undo\
-Ctrl + Z
+`Ctrl + Z`
 
 Redo\
-Ctrl + Y
+`Ctrl + Y`
 
 ------------------------------------------------------------------------
 
 # ✦ Architecture
 
-src/ features/ tabs/ history/ autosave/ ui/
+    src/
+      features/
+        tabs/
+        history/
+        autosave/
+      ui/
 
-src-tauri/ src/
-
-TabState is the single source of truth.
+    src-tauri/
+      src/
+        lib.rs
 
 ------------------------------------------------------------------------
 
 # ✦ Tech Stack
 
-Frontend - Vanilla JavaScript - CSS HUD styling - Vite
+Frontend:
 
-Backend - Rust - Tauri v2
+-   Vanilla JavaScript
+-   Custom CSS HUD styling
+-   Vite
+
+Backend:
+
+-   Rust
+-   Tauri v2
 
 ------------------------------------------------------------------------
 
 # ✦ Development
 
-Install
+Install:
 
+``` bash
 npm install
+```
 
-Run
+Run dev:
 
+``` bash
 npm run tauri dev
+```
 
-Build
+Build:
 
+``` bash
 npm run tauri build
-
-------------------------------------------------------------------------
-
-# ✦ Portable executable
-
-Run directly
-
-cyberpad.exe
+```
 
 ------------------------------------------------------------------------
 
 # ✦ License
 
 MIT
-
-------------------------------------------------------------------------
-
-CyberPad\
-by Nutcracker
