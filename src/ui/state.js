@@ -2,6 +2,10 @@ export function createState() {
     return {
         currentFilePath: null,
         dirty: false,
+
+        // tabs
+        tabs: [],
+        activeTabId: null,
     };
 }
 

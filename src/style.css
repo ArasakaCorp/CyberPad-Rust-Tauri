@@ -1,11 +1,25 @@
+
 :root{
     --bg: #070b10;
     --panel: rgba(8, 16, 22, 0.66);
-    --cyan: #33d6ff;
-    --cyanDim: rgba(51,214,255,0.25);
+
+    /* semantic theme tokens */
+    --accent: #33d6ff;
+    --accent-dim: rgba(51,214,255,0.25);
+
     --text: #cfe9f2;
     --muted: rgba(207, 233, 242, 0.55);
+
     --shadow: rgba(0,0,0,0.55);
+
+    /* status colors (future themes will override these) */
+    --success: #33ffcc;
+    --warning: rgba(255,176,0,0.95);
+
+    /* tab strip */
+    --tab-h: 10px;
+    --tab-gap: 8px;
+    --tab-radius: 999px;
 }
 /* FONTS */
 
@@ -132,7 +146,7 @@ html, body{
     align-items:center;
     justify-content: space-between;
     padding: 0 14px;
-    border-bottom: 1px solid rgba(51,214,255,0.18);
+ /*   border-bottom: 1px solid rgba(51,214,255,0.18);*/
     background: rgba(0,0,0,0.08);
     min-height: 0;
 }
@@ -157,7 +171,6 @@ html, body{
 
     white-space: nowrap;
     overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 /* Иконка “чипа” рядом с заголовком */
@@ -176,12 +189,6 @@ html, body{
     height: 100%;
     object-fit: contain;
     display: block;
-}
-
-.header-actions{
-    display:flex;
-    gap: 8px;
-    align-items:center;
 }
 
 .header-actions{
@@ -280,9 +287,8 @@ textarea{
     letter-spacing: 0.04em;;
     line-height: 1.5;
     caret-color: rgba(51,214,255,1);
-
-    text-shadow: 0 0 18px rgba(51,214,255,0.12);
 }
+
 textarea::placeholder{
     color: rgba(51,214,255,0.30);
     text-shadow: none;
@@ -533,42 +539,6 @@ textarea{
     user-select:none;
 }
 
-/* временный статус сохранения */
-.header-value.saved{
-    color: #33ffcc;
-
-    text-shadow:
-            0 0 6px rgba(51,255,204,0.8),
-            0 0 18px rgba(51,255,204,0.6),
-            0 0 32px rgba(51,255,204,0.4);
-
-    letter-spacing: 0.35em;
-
-    animation: savedFlash 700ms ease;
-}
-
-@keyframes savedFlash{
-    0%   { opacity:0; transform: translateY(-2px); }
-    30%  { opacity:1; }
-    100% { opacity:1; }
-}
-
-.header.saved::after{
-    content:"";
-    position:absolute;
-    left:0;
-    right:0;
-    bottom:-1px;
-    height:2px;
-    background: linear-gradient(90deg, transparent, #33ffcc, transparent);
-    animation: scan 600ms ease;
-}
-
-@keyframes scan{
-    from { transform: translateX(-100%); }
-    to   { transform: translateX(100%); }
-}
-
 .char-status {
     position: absolute;
     right: 65px;
@@ -653,7 +623,6 @@ textarea{
     letter-spacing: 0.02em;
     opacity: 0.55;
     overflow: hidden;
-    text-overflow: ellipsis;
     white-space: nowrap;
 }
 
@@ -696,7 +665,6 @@ textarea{
 
     white-space: nowrap;      /* 🔥 ключевое */
     overflow: hidden;
-    text-overflow: ellipsis;  /* если не помещается — аккуратно обрежет */
 
     display: block;
 }
@@ -711,4 +679,176 @@ textarea{
 .creditsBar a:hover{
     color: rgba(51,214,255,1);
     border-bottom-color: rgba(51,214,255,0.9);
+}
+
+/* ======================================================================
+   TAB STRIP
+   ====================================================================== */
+
+.tabstrip{
+    position: relative;
+    padding: 0 14px 4px 14px;
+    background: rgba(0,0,0,0.02);
+    margin-top: -3px;
+}
+
+.tabs{
+    display:flex;
+    align-items:center;
+    gap: 6px;
+    height: 10px;
+}
+
+/* Tab slot button geometry */
+.tab{
+    position: relative;
+    flex: 1;
+    height: 10px;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    background: transparent;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+}
+
+/* Tab line */
+.tab::before{
+    content:"";
+    position:absolute;
+    left:0;
+    top:50%;
+    height:1px;
+    width:100%;
+    transform: translateY(-50%) scaleX(1);
+    transform-origin: left center;
+    border-radius:999px;
+
+    background: rgba(51,214,255,0.12);
+    opacity: 0.55;
+    box-shadow: 0 0 10px rgba(51,214,255,0.06);
+}
+
+/* hover/active style only */
+.tab:hover::before{
+    background: rgba(51,214,255,0.22);
+    opacity: 0.9;
+    box-shadow: 0 0 16px rgba(51,214,255,0.12);
+}
+
+.tab[aria-selected="true"]::before{
+    background: rgba(51,214,255,0.45);
+    opacity: 1;
+    box-shadow: 0 0 22px rgba(51,214,255,0.20);
+}
+
+/* enter animation: transform-only (stable, compositor-friendly) */
+.tab.tab-enter::before{
+    transform: translateY(-50%) scaleX(0);
+    transition: transform 220ms ease-out;
+}
+.tab.tab-enter.tab-enter-active::before{
+    transform: translateY(-50%) scaleX(1);
+}
+
+/* ======================================================================
+   HEADER: layered title (no blink)
+   ====================================================================== */
+/* Keep header single-line always */
+#topFile{
+    position: relative;
+    display: block;          /* чтобы нормально занимал ширину */
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;     /* НИКОГДА не переносим */
+    overflow: hidden;
+}
+
+/* КЛЮЧ: когда включен preview (hover таба) — разрешаем вылезать */
+#topFile.is-preview{
+    overflow: visible;
+    z-index: 50;          /* поверх внутри header */
+}
+
+/* и сам preview слой делаем шириной по контенту */
+#topFile .top-file-preview{
+    width: max-content;
+    max-width: none;
+    right: auto;          /* чтобы inset не зажимал */
+    overflow: visible;    /* не режь */
+    opacity: 0;
+    pointer-events: none;
+}
+
+/* когда preview включен */
+#topFile .top-file-preview.is-on{ opacity: 1; }
+
+/* SAVED overlay */
+/* SAVED overlay */
+#topFile.saved::after{
+    content: attr(data-saved-text);
+    position: absolute;
+    inset: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    pointer-events: none;
+
+    color: var(--success);
+    text-shadow:
+            0 0 6px color-mix(in srgb, var(--success) 80%, transparent),
+            0 0 18px color-mix(in srgb, var(--success) 60%, transparent),
+            0 0 32px color-mix(in srgb, var(--success) 40%, transparent);
+
+    letter-spacing: 0.35em;
+    animation: savedFlash 700ms ease;
+}
+
+#topFile.unsaved{
+    color: rgba(255, 90, 90, 0.98);
+    text-shadow:
+            0 0 8px rgba(255, 80, 80, 0.45),
+            0 0 22px rgba(255, 80, 80, 0.22);
+
+    animation: topFileShake 220ms ease-in-out;
+    will-change: transform;
+}
+
+@keyframes topFileShake{
+    0%   { transform: translateX(0); }
+    12%  { transform: translateX(-1px); }
+    24%  { transform: translateX(2px); }
+    36%  { transform: translateX(-2px); }
+    48%  { transform: translateX(2px); }
+    60%  { transform: translateX(-1px); }
+    72%  { transform: translateX(1px); }
+    100% { transform: translateX(0); }
+}
+
+/* Hide underlying layers while SAVED is shown */
+#topFile.saved .top-file-active,
+#topFile.saved .top-file-preview{
+    opacity: 0;
+}
+
+/* Preview overlays active */
+#topFile .top-file-preview{
+    position: absolute;
+    inset: 0;
+    white-space: nowrap;
+    overflow: hidden;
+
+    opacity: 0;
+    transition: opacity 140ms ease;
+    pointer-events: none;
+}
+#topFile .top-file-preview.is-on{ opacity: 1; }
+
+#topFile.is-preview .top-file-active{
+    opacity: 0;
+    transition: opacity 140ms ease;
+}
+#topFile .top-file-active{
+    transition: opacity 140ms ease;
 }

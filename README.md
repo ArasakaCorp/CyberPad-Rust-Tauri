@@ -2,201 +2,179 @@
 
 Minimalist industrial notepad for people who prefer terminals over toys.
 
-CyberPad is a lightweight, frameless, transparent **Tauri-based editor
-written in Rust and Vanilla JavaScript**, designed to feel like a small
-system utility rather than a traditional application.\
-Fast launch, zero clutter, keyboard-first, and built with a
-cyber-industrial HUD aesthetic.
+CyberPad is a lightweight, frameless, transparent **Tauri‑based
+multi‑tab editor** written in Rust and Vanilla JavaScript, designed to
+feel like a small system utility rather than a traditional application.
+
+Fast launch. Zero clutter. Keyboard‑first. Persistent state. Native
+performance.
 
 Inspired by the **Memory Shards** interface from *Cyberpunk 2077* ---
 small, floating, diegetic data panels that feel like hardware rather
 than software.
 
-Think: firmware tool, not IDE.
+------------------------------------------------------------------------
+
+# ✦ What's New --- Tab Engine
+
+CyberPad now includes a full tab engine with persistent state and
+isolated editor history.
+
+New capabilities:
+
+-   Multi‑tab system
+-   Per‑tab undo / redo history
+-   Persistent tab session restore
+-   Per‑tab autosave
+-   Dirty state tracking per tab
+-   Tab close protection
+-   Header preview system
+-   Persistent tab snapshots
+
+Each tab behaves like an independent editor instance.
 
 ------------------------------------------------------------------------
 
-## ✦ Inspiration
+# ✦ Features
 
-CyberPad's design language is directly inspired by:
-
--   Memory Shards UI from *Cyberpunk 2077*
--   industrial terminals
--   embedded devices
--   transparent HUD overlays
--   "always-on-side" utility tools
-
-The goal was to create something that feels like a **piece of
-equipment**, not a windowed app.
-
-Subtle glow.\
-Sharp edges.\
-Minimal chrome.\
-Maximum focus.
-
-------------------------------------------------------------------------
-
-## ✦ Features
+## Core
 
 -   Frameless transparent HUD window
--   Native Rust backend
--   Drag & Drop file opening
--   Open / Save / Save As
--   Autosave indicator
--   Undo / Redo history stack
--   Character counter
+-   Native Rust backend (Tauri)
+-   Instant startup
+-   Extremely low memory footprint
+-   Portable executable
+
+## Tabs System
+
+-   Unlimited tabs
+-   Independent content per tab
+-   Independent undo / redo history
+-   Persistent tabs on restart
+-   Dirty state tracking
+-   Scratch tabs supported
+
+## File Operations
+
+-   Open file
+-   Save
+-   Save As
+-   Drag & Drop
 -   Recent files list
--   Slide-out drawer menu
--   Portable executable (no installer required)
--   Extremely small footprint
--   No frameworks, no React, no bloat
+-   Persistent recent history
+
+## History Engine
+
+-   Per‑tab undo / redo stacks
+-   No cross‑tab history corruption
+-   Deterministic behavior
+-   Proper undo isolation
+
+## Autosave
+
+-   Per‑tab autosave
+-   Idle autosave
+-   Autosave indicator
+
+## HUD Interface
+
+-   Cyberpunk Memory Shard UI
+-   Header preview system
+-   Layered title rendering
+-   Slide‑out drawer
+-   Character counter
 
 ------------------------------------------------------------------------
 
-## ✦ Tech Stack
+# ✦ Keyboard Shortcuts
 
--   **Tauri v2**
--   **Rust**
--   **Vite**
--   **Vanilla JavaScript**
--   **Custom CSS HUD styling**
--   **Native OS dialogs via Tauri plugins**
+## File
 
-Architecture philosophy:
+Open file\
+`Ctrl + O`
 
-> small modules \> big frameworks
+Save\
+`Ctrl + S`
+
+Save As\
+`Ctrl + Shift + S`
+
+## Tabs
+
+New tab\
+`Ctrl + T`
+
+Close tab\
+`Double‑click tab`
+
+Switch tab\
+`Click tab`
+
+Preview filename\
+`Hover tab`
+
+## Editing
+
+Undo\
+`Ctrl + Z`
+
+Redo\
+`Ctrl + Y`
+
+------------------------------------------------------------------------
+
+# ✦ Architecture
 
     src/
-      ui/
       features/
-      services/
+        tabs/
+        history/
+        autosave/
+      ui/
 
     src-tauri/
       src/
         lib.rs
 
-Frontend handles UI.\
-Rust handles system access (filesystem, dialogs, OS integration).
+------------------------------------------------------------------------
 
-Secure bridge via Tauri `invoke`.
+# ✦ Tech Stack
+
+Frontend:
+
+-   Vanilla JavaScript
+-   Custom CSS HUD styling
+-   Vite
+
+Backend:
+
+-   Rust
+-   Tauri v2
 
 ------------------------------------------------------------------------
 
-## ✦ Development
+# ✦ Development
 
-### Install
+Install:
 
 ``` bash
 npm install
 ```
 
-### Run (dev)
+Run dev:
 
 ``` bash
 npm run tauri dev
 ```
 
-### Build
+Build:
 
 ``` bash
 npm run tauri build
 ```
 
-Outputs:
-
-    src-tauri/target/release/cyberpad.exe
-    src-tauri/target/release/bundle/nsis/
-    src-tauri/target/release/bundle/msi/
-
 ------------------------------------------------------------------------
 
-## ✦ Portable executable
-
-CyberPad runs as a standalone binary.
-
-No installation required.
-
-Just launch:
-
-    cyberpad.exe
-
-------------------------------------------------------------------------
-
-## ✦ Drag & Drop
-
-Drop any `.txt`, `.md`, or plain text file directly onto the window.
-
-Handled natively via Tauri WebView drag-drop events.
-
-Works in both:
-
--   development
--   production builds
-
-------------------------------------------------------------------------
-
-## ✦ Philosophy
-
-CyberPad intentionally avoids:
-
--   heavy frameworks
--   complex state managers
--   visual noise
--   unnecessary UI
-
-It aims to behave like:
-
-> a small system console you keep on the side of your screen
-
-Fast. Focused. Disposable. Reliable.
-
-------------------------------------------------------------------------
-
-## ✦ Credits
-
-CyberPad\
-by Nutcracker\
-Sponsored by ArasakaCorp
-
-GitHub (Rust version): https://github.com/ArasakaCorp/CyberPad-Rust-Tauri
-
-GitHub (Electron version): https://github.com/ArasakaCorp/CyberPad
-
-------------------------------------------------------------------------
-
-## ✦ AI Assistance
-
-Parts of the architecture, refactoring, feature implementation, and documentation were developed with assistance from **ChatGPT (OpenAI)** using the **GPT‑5 model family** as an engineering copilot.
-
-The AI was used for:
-- architecture planning
-- module design
-- refactoring suggestions
-- UI/UX ideas
-- documentation generation
-
-All final decisions, integration, and testing were performed manually.#
-
-------------------------------------------------------------------------
-
-
-## ✦ License
+# ✦ License
 
 MIT
-
-Do whatever you want.\
-Ship it. Modify it. Break it. Rebuild it.
-
-------------------------------------------------------------------------
-
-## ✦ Why
-
-Because sometimes you just want:
-
-a small glowing window\
-floating over everything\
-waiting for thoughts.
-
-Not an IDE.\
-Not a browser tab.\
-Just a tool.

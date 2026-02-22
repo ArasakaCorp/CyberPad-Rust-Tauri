@@ -13,7 +13,7 @@ export function renderLayout(root) {
         <header class="header drag">
           <div class="header-title">
             <span class="chip-icon"><img src="${iconUrl}" alt=""></span>
-            <span id="topFile" class="header-value">NOTE.txt</span>
+            <span id="topFile" class="header-value"></span>
           </div>
 
           <div class="header-actions no-drag">
@@ -21,6 +21,11 @@ export function renderLayout(root) {
             <button id="closeBtn" class="wbtn close" title="Close">X</button>
           </div>
         </header>
+        
+        <div class="tabstrip no-drag" aria-label="Tabs">
+          <div class="tabs" id="tabs" role="tablist" aria-hidden="true">
+          </div>
+        </div>
 
         <div id="drawer" class="drawer" aria-hidden="true">
           <div class="drawer-inner">

@@ -1,9 +1,8 @@
-import { applyOpenedFile } from "./fileActions.js";
 import { closeDrawer } from "./drawer.js";
 import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWebview } from "@tauri-apps/api/webview";
 
-export function initDragDrop(dom, state, { onOpened } = {}) {
+export function initDragDrop(dom, state, { onOpened, tabs } = {}) {
     const hud = document.querySelector(".hud.panel");
 
     function setDragUI(on) {
@@ -17,8 +16,14 @@ export function initDragDrop(dom, state, { onOpened } = {}) {
         const res = await invoke("open_path", { path: filePath });
         if (!res) return;
 
-        applyOpenedFile(dom, state, res);
-        onOpened?.(res.filePath);
+        if (tabs?.openPayloadInNewTab) {
+            const tab = tabs.openPayloadInNewTab(res);
+            onOpened?.(tab?.filePath ?? res.filePath);
+        } else {
+            // fallback: legacy single-doc behavior (если tabs не подключены)
+            // applyOpenedFile(dom, state, res);
+            onOpened?.(res.filePath);
+        }
     }
 
     (async () => {
@@ -40,9 +45,7 @@ export function initDragDrop(dom, state, { onOpened } = {}) {
             if (p.type === "drop") {
                 setDragUI(false);
                 const filePath = p.paths?.[0];
-                if (filePath) {
-                    void openByPath(filePath);
-                }
+                if (filePath) void openByPath(filePath);
             }
         });
     })();
