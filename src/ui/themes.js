@@ -1,0 +1,25 @@
+export async function loadTheme() {
+    // const saved = localStorage.getItem("cyberpad:theme");
+    //
+    // if (saved) return JSON.parse(saved);
+
+    // default
+    const res = await fetch("/themes/theme_default.json");
+
+    //Militech
+    //const res = await fetch("/themes/theme_militech.json");
+
+    //Arasaka
+    //const res = await fetch("/themes/theme_arasaka.json");
+
+    const data = await res.json();
+    console.log(data);
+
+    return data;
+}
+
+export function applyTheme(theme){
+    const root = document.documentElement;
+    for (const [k,v] of Object.entries(theme.vars)) root.style.setProperty(k, v);
+    localStorage.setItem("cyberpad:theme", JSON.stringify(theme));
+}

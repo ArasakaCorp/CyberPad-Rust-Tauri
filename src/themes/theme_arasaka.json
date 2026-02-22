@@ -1,0 +1,14 @@
+{
+  "name": "Arasaka Corporate (Dark Graphite + Red/White)",
+  "vars": {
+    "--app-bg-rgb": "3, 3, 3",
+    "--panel-rgb": "18, 18, 18",
+    "--rail-rgb": "12, 12, 12",
+    "--text-rgb": "255, 255, 255",
+    "--accent-rgb": "191, 18, 23",
+    "--success-rgb": "200, 255, 230",
+    "--warning-rgb": "255, 176, 0",
+    "--danger-rgb": "255, 90, 90",
+    "--shadow-rgb": "0, 0, 0"
+  }
+}

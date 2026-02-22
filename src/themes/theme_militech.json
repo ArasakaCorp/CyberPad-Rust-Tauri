@@ -1,0 +1,13 @@
+{
+  "name": "Militech Memo (Navy + Pale Yellow)",
+  "vars": {
+    "--app-bg-rgb": "9, 17, 24",
+    "--panel-rgb": "12, 26, 36",
+    "--text-rgb": "210, 206, 165",
+    "--accent-rgb": "232, 224, 162",
+    "--success-rgb": "170, 230, 190",
+    "--warning-rgb": "255, 214, 120",
+    "--danger-rgb": "255, 120, 120",
+    "--shadow-rgb": "0, 0, 0"
+  }
+}

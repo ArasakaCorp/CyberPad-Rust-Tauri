@@ -15,9 +15,14 @@ import { initHistory } from "./features//history/history.js";
 import { initDragDrop } from "./features/dragDrop.js";
 import { initCredits } from "./features/credits.js";
 import { initTabs } from "./features/tabs/TabsController.js";
+import { loadTheme, applyTheme } from "./ui/themes.js";
 
 async function main() {
     const root = document.querySelector("#app");
+
+    const theme = await loadTheme();
+    applyTheme(theme);
+
     renderLayout(root);
 
 
