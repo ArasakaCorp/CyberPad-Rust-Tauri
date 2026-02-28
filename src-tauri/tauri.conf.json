@@ -31,39 +31,21 @@
     "active": true,
     "fileAssociations": [
       {
-        "ext": ["txt", "log", "md"],
+        "ext": [
+          "txt",
+          "log",
+          "md"
+        ],
         "name": "CyberPad Note",
         "description": "CyberPad text note"
       }
     ],
-    "targets": ["nsis", "msi"],
-    "icon": [
+    "icon": [a
       "icons/32x32.png",
       "icons/128x128.png",
       "icons/128x128@2x.png",
       "icons/icon.icns",
       "icons/icon.ico"
-    ],
-    "windows": {
-      "allowDowngrades": true,
-
-      "webviewInstallMode": {
-        "type": "downloadBootstrapper",
-        "silent": true
-      },
-
-      "nsis": {
-        "installerIcon": "icons/icon.ico",
-        "installMode": "currentUser",
-        "startMenuFolder": "CyberPad",
-        "displayLanguageSelector": false,
-        "compression": "lzma"
-      },
-
-      "wix": {
-        "language": "en-US",
-        "upgradeCode": "4314b947-597f-55fd-917a-cf735a07aaa6"
-      }
-    }
+    ]
   }
 }
