@@ -30,6 +30,7 @@ export function createHeaderView(dom, state) {
             previewEl.textContent = nameOf(hover);
             previewEl.classList.add("is-on");
         } else {
+            previewEl.textContent = "";
             previewEl.classList.remove("is-on");
         }
 

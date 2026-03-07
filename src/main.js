@@ -53,7 +53,7 @@ async function main() {
     const onOpened = (filePath) => {
         pushRecent(dom, filePath);
         autosave.setAutosaveState("idle");
-        history.reset(dom.editor.value);
+        history.resetActive(dom.editor.value);
     };
 
 

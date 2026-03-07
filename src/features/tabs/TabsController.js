@@ -40,7 +40,7 @@ function createEmptyTab() {
 /* restore                      */
 /* ----------------------------- */
 
-async function restoreTabsIntoLegacyState(legacyState) {
+async function restoreTabsIntoLegacyState() {
 
     const saved = loadPersistedTabsSnapshot();
 
@@ -80,14 +80,6 @@ async function restoreTabsIntoLegacyState(legacyState) {
             _scratch: false,
         });
     }
-
-    legacyState.tabs = hydratedTabs;
-
-    legacyState.activeTabId =
-        saved.activeId &&
-        hydratedTabs.some(t => t.id === saved.activeId)
-            ? saved.activeId
-            : hydratedTabs[0]?.id ?? null;
 }
 
 
@@ -97,7 +89,6 @@ async function restoreTabsIntoLegacyState(legacyState) {
 
 export async function initTabs(
     dom,
-    legacyState,
     { autosave, onOpened } = {}
 ) {
 
@@ -108,7 +99,7 @@ export async function initTabs(
     /* restore                  */
     /* ------------------------- */
 
-    await restoreTabsIntoLegacyState(legacyState);
+    await restoreTabsIntoLegacyState();
 
 
     /* ------------------------- */
@@ -116,8 +107,8 @@ export async function initTabs(
     /* ------------------------- */
 
     const state = createTabState({
-        tabs: legacyState.tabs ?? [],
-        activeId: legacyState.activeTabId ?? null,
+        tabs: [],
+        activeId: null,
     });
 
     if (!state.getSnapshot().tabs.length) {
@@ -187,10 +178,6 @@ export async function initTabs(
 
         if (dom.editor.value !== active.content)
             dom.editor.value = active.content ?? "";
-
-        legacyState.currentFilePath = active.filePath ?? null;
-        legacyState.dirty = !!active.dirty;
-        legacyState.activeTabId = state.getSnapshot().activeId;
 
         autosave?.resetAutosaveForTab?.(active.id);
 
@@ -356,9 +343,6 @@ export async function initTabs(
             content: dom.editor.value,
         });
 
-        legacyState.currentFilePath = filePath;
-        legacyState.dirty = false;
-
         autosave?.resetAutosaveForTab?.(active.id);
     }
 
@@ -398,9 +382,6 @@ export async function initTabs(
             content,
             dirty: shouldBeDirty,
         });
-
-        legacyState.dirty = shouldBeDirty;
-        legacyState.currentFilePath = active.filePath ?? null;
     });
 
 
@@ -428,13 +409,10 @@ export async function initTabs(
         applySavedPath,
 
         markClean() {
-
             const active = state.getActive();
 
             if (active)
                 active.dirty = false;
-
-            legacyState.dirty = false;
         },
 
         destroy() {
