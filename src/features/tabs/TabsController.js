@@ -46,6 +46,7 @@ async function restoreTabsIntoLegacyState() {
 
     if (!saved?.tabs?.length) return;
 
+    const hydratedTabs = [];
 
     for (const t of saved.tabs) {
 
