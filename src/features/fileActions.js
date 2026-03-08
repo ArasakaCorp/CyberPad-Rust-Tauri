@@ -1,7 +1,7 @@
 import { fileNameFromPath } from "../ui/state.js";
 import { updateCharCount } from "./counter.js";
 import { closeDrawer } from "./drawer.js";
-import { invoke } from "@tauri-apps/api/core"; // если v1, будет "@tauri-apps/api/tauri"
+import { invoke } from "@tauri-apps/api/core";
 import { UIStrings } from "../ui/UIStrings.js";
 
 

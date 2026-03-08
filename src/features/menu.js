@@ -1,6 +1,6 @@
 import { WebviewWindow } from "@tauri-apps/api/webviewWindow";
 import { getCurrentWindow } from "@tauri-apps/api/window";
-
+import { invoke } from "@tauri-apps/api/core";
 
 export async function openSettingsWindow() {
     const existing = await WebviewWindow.getByLabel("settings");
