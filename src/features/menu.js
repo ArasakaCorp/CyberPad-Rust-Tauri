@@ -15,10 +15,11 @@ export async function openSettingsWindow() {
         title: "CyberPad Settings",
         width: 920,
         height: 640,
-        resizable: true,
+        resizable: false,
         center: true,
         decorations: false,
         transparent: true,
+        shadow: false
     });
 
     win.once("tauri://created", () => {

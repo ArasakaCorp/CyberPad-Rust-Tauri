@@ -4,7 +4,6 @@ export function renderSettingsLayout(root) {
         <div class="hud panel settings-panel">
           <header class="settings-header drag">
             <div class="header-title">
-              <span class="chip-icon"><img src="/assets/icons/icon.png" alt=""></span>
               <span class="header-value">SETTINGS</span>
             </div>
 
