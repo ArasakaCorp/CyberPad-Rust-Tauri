@@ -46,7 +46,6 @@ async function restoreTabsIntoLegacyState() {
 
     if (!saved?.tabs?.length) return;
 
-    const hydratedTabs = [];
 
     for (const t of saved.tabs) {
 
@@ -211,46 +210,50 @@ export async function initTabs(
         void dom.topFile.offsetWidth; // reflow
         dom.topFile.classList.add("unsaved");
 
-        console.log("UNSAVED flash", dom.topFile?.id, dom.topFile?.className);
-
         dom.__unsavedTimer = setTimeout(() => {
             dom.topFile.classList.remove("unsaved");
         }, 240);
     }
 
     function closeTab(tabId, { force = false } = {}) {
-
         const tab = state.getTab(tabId);
+        if (!tab) return false;
 
-        if (!tab) return;
+        const snap = state.getSnapshot();
+        const isActive = tabId === snap.activeId;
 
-        if (tab.dirty && !force) {
+        if (isActive) {
+            const content = dom.editor.value;
+            const isScratch = !tab.filePath;
+            const dirty = isScratch
+                ? content.trim().length > 0
+                : tab.dirty;
+
+            state.update(tab.id, { content, dirty });
+        }
+
+        const fresh = state.getTab(tabId);
+        if (fresh.dirty && !force) {
             showUnsavedCloseBlocked(dom);
             return false;
         }
 
-        const snap = state.getSnapshot();
-
-        const wasActive =
-            tabId === snap.activeId;
+        const wasActive = tabId === snap.activeId;
 
         state.remove(tabId);
 
         const after = state.getSnapshot();
 
         if (!after.tabs.length) {
-
             const tab = createEmptyTab();
-
             state.addFront(tab);
             state.setActive(tab.id);
-
         } else if (wasActive) {
-
             state.setActive(after.tabs[0].id);
         }
 
         applyActiveToEditor();
+        return true;
     }
 
     function openPayloadInNewTab(res) {
@@ -372,7 +375,6 @@ export async function initTabs(
         if (!active) return;
 
         const content = dom.editor.value;
-
         const isScratch = !active.filePath;
         const shouldBeDirty = isScratch
             ? content.trim().length > 0

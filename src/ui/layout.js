@@ -33,6 +33,7 @@ export function renderLayout(root) {
             <button id="menuOpen" class="menu-item">OPEN</button>
             <button id="menuSave" class="menu-item">SAVE</button>
             <button id="menuSaveAs" class="menu-item">SAVE AS…</button>
+            <button id="menuSettings" class="menu-item">SETTINGS</button>
 
             <div class="drawer-sep"></div>
 

@@ -1,4 +1,3 @@
-import { syncSaveState } from "./fileActions.js";
 import { invoke } from "@tauri-apps/api/core";
 
 export function initAutosave(dom, state, opts = {}) {
@@ -57,14 +56,7 @@ export function initAutosave(dom, state, opts = {}) {
             });
 
             if (res?.ok) {
-
                 active.dirty = false;
-
-                state.currentFilePath = active.filePath;
-                state.dirty = false;
-
-                syncSaveState(dom, state);
-
                 setAutosaveState("saved");
             }
 
