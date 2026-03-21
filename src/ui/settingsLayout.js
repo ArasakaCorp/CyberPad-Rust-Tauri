@@ -1,0 +1,66 @@
+export function renderSettingsLayout(root) {
+    root.innerHTML = `
+      <div class="app-shell settings-shell">
+        <div class="hud panel settings-panel">
+          <header class="settings-header drag">
+            <div class="header-title">
+              <span class="header-value">SETTINGS</span>
+            </div>
+
+            <div class="header-actions no-drag">
+              <button id="settingsCloseBtn" class="wbtn close" title="Close">X</button>
+            </div>
+          </header>
+
+          <div class="settings-body">
+            <aside class="settings-nav no-drag">
+              <button class="settings-nav-item is-active" data-pane="shortcuts">SHORTCUTS</button>
+              <button class="settings-nav-item" data-pane="storage">STORAGE</button>
+              <button class="settings-nav-item" data-pane="themes">THEMES</button>
+              <button class="settings-nav-item" data-pane="about">ABOUT</button>
+            </aside>
+
+            <main class="settings-content">
+            <section class="settings-pane is-active" data-pane-view="shortcuts">
+              <h2>Shortcuts</h2>
+              <div class="settings-list">
+                <div class="settings-row"><span>Ctrl + N</span><span>New tab</span></div>
+                <div class="settings-row"><span>Ctrl + W</span><span>Close active tab</span></div>
+                <div class="settings-row"><span>Ctrl + S</span><span>Save</span></div>
+                <div class="settings-row"><span>Ctrl + Shift + S</span><span>Save as</span></div>
+                <div class="settings-row"><span>Ctrl + O</span><span>Open file</span></div>
+                <div class="settings-row"><span>Alt + Left</span><span>Previous tab</span></div>
+                <div class="settings-row"><span>Alt + Right</span><span>Next tab</span></div>
+                <div class="settings-row"><span>Double click tab</span><span>Close tab</span></div>
+                <div class="settings-row"><span>Drag &amp; drop</span><span>Open files in new tab</span></div>
+              </div>
+            </section>
+
+              <section class="settings-pane" data-pane-view="storage" hidden>
+                <h2>Storage</h2>
+                <div class="settings-actions">
+                 <button id="resetAllBtn" class="menu-item danger" type="button">RESET ALL APP DATA</button>
+                </div>
+              </section>
+
+              <section class="settings-pane" data-pane-view="themes" hidden>
+                <h2>Themes</h2>
+                <div class="theme-grid">
+                  <button class="theme-card is-active" data-theme="memory-shard">Memory Shard</button>
+                </div>
+              </section>
+
+              <section class="settings-pane" data-pane-view="about" hidden>
+                <h2>About</h2>
+                <div class="settings-list">
+                  <div class="settings-row"><span>App</span><span>CyberPad</span></div>
+                  <div class="settings-row"><span>Version</span><span>v0.1.3</span></div>
+                  <div class="settings-row"><span>Author</span><span>Nutcracker</span></div>
+                </div>
+              </section>
+            </main>
+          </div>
+        </div>
+      </div>
+    `;
+}

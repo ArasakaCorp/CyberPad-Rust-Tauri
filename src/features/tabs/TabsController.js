@@ -40,7 +40,7 @@ function createEmptyTab() {
 /* restore                      */
 /* ----------------------------- */
 
-async function restoreTabsIntoLegacyState(legacyState) {
+async function restoreTabsIntoLegacyState() {
 
     const saved = loadPersistedTabsSnapshot();
 
@@ -80,14 +80,6 @@ async function restoreTabsIntoLegacyState(legacyState) {
             _scratch: false,
         });
     }
-
-    legacyState.tabs = hydratedTabs;
-
-    legacyState.activeTabId =
-        saved.activeId &&
-        hydratedTabs.some(t => t.id === saved.activeId)
-            ? saved.activeId
-            : hydratedTabs[0]?.id ?? null;
 }
 
 
@@ -97,7 +89,6 @@ async function restoreTabsIntoLegacyState(legacyState) {
 
 export async function initTabs(
     dom,
-    legacyState,
     { autosave, onOpened } = {}
 ) {
 
@@ -108,7 +99,7 @@ export async function initTabs(
     /* restore                  */
     /* ------------------------- */
 
-    await restoreTabsIntoLegacyState(legacyState);
+    await restoreTabsIntoLegacyState();
 
 
     /* ------------------------- */
@@ -116,8 +107,8 @@ export async function initTabs(
     /* ------------------------- */
 
     const state = createTabState({
-        tabs: legacyState.tabs ?? [],
-        activeId: legacyState.activeTabId ?? null,
+        tabs: [],
+        activeId: null,
     });
 
     if (!state.getSnapshot().tabs.length) {
@@ -188,10 +179,6 @@ export async function initTabs(
         if (dom.editor.value !== active.content)
             dom.editor.value = active.content ?? "";
 
-        legacyState.currentFilePath = active.filePath ?? null;
-        legacyState.dirty = !!active.dirty;
-        legacyState.activeTabId = state.getSnapshot().activeId;
-
         autosave?.resetAutosaveForTab?.(active.id);
 
         dom.__updateCharCount?.();
@@ -224,46 +211,50 @@ export async function initTabs(
         void dom.topFile.offsetWidth; // reflow
         dom.topFile.classList.add("unsaved");
 
-        console.log("UNSAVED flash", dom.topFile?.id, dom.topFile?.className);
-
         dom.__unsavedTimer = setTimeout(() => {
             dom.topFile.classList.remove("unsaved");
         }, 240);
     }
 
     function closeTab(tabId, { force = false } = {}) {
-
         const tab = state.getTab(tabId);
+        if (!tab) return false;
 
-        if (!tab) return;
+        const snap = state.getSnapshot();
+        const isActive = tabId === snap.activeId;
 
-        if (tab.dirty && !force) {
+        if (isActive) {
+            const content = dom.editor.value;
+            const isScratch = !tab.filePath;
+            const dirty = isScratch
+                ? content.trim().length > 0
+                : tab.dirty;
+
+            state.update(tab.id, { content, dirty });
+        }
+
+        const fresh = state.getTab(tabId);
+        if (fresh.dirty && !force) {
             showUnsavedCloseBlocked(dom);
             return false;
         }
 
-        const snap = state.getSnapshot();
-
-        const wasActive =
-            tabId === snap.activeId;
+        const wasActive = tabId === snap.activeId;
 
         state.remove(tabId);
 
         const after = state.getSnapshot();
 
         if (!after.tabs.length) {
-
             const tab = createEmptyTab();
-
             state.addFront(tab);
             state.setActive(tab.id);
-
         } else if (wasActive) {
-
             state.setActive(after.tabs[0].id);
         }
 
         applyActiveToEditor();
+        return true;
     }
 
     function openPayloadInNewTab(res) {
@@ -356,9 +347,6 @@ export async function initTabs(
             content: dom.editor.value,
         });
 
-        legacyState.currentFilePath = filePath;
-        legacyState.dirty = false;
-
         autosave?.resetAutosaveForTab?.(active.id);
     }
 
@@ -388,7 +376,6 @@ export async function initTabs(
         if (!active) return;
 
         const content = dom.editor.value;
-
         const isScratch = !active.filePath;
         const shouldBeDirty = isScratch
             ? content.trim().length > 0
@@ -398,9 +385,6 @@ export async function initTabs(
             content,
             dirty: shouldBeDirty,
         });
-
-        legacyState.dirty = shouldBeDirty;
-        legacyState.currentFilePath = active.filePath ?? null;
     });
 
 
@@ -428,13 +412,10 @@ export async function initTabs(
         applySavedPath,
 
         markClean() {
-
             const active = state.getActive();
 
             if (active)
                 active.dirty = false;
-
-            legacyState.dirty = false;
         },
 
         destroy() {

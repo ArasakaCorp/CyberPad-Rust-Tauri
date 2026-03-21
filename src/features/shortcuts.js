@@ -11,7 +11,6 @@ let altPressed = false;
  * Keeps init clean: all logic lives in dedicated handlers.
  */
 export function initShortcuts(dom, tabs) {
-
     if (!dom) {
         console.warn("Shortcuts: dom missing");
         return;
@@ -28,23 +27,18 @@ export function initShortcuts(dom, tabs) {
         if (tabs && handleNextTabShortcut(e, tabs)) return;
         if (tabs && handlePrevTabShortcut(e, tabs)) return;
         if (tabs && handleCloseTabShortcut(e, tabs)) return;
-        if (tabs && handleNewTabShortcut(e, dom, tabs)) return;
+        if (tabs && handleNewTabShortcut(e, tabs)) return;
 
         if (handleOpenShortcut(e, dom)) return;
-
         if (handleSaveShortcut(e, dom)) return;
         if (handleSaveAsShortcut(e, dom)) return;
-
         if (handleTabInsertion(e, dom)) return;
-
     }, { capture: true });
 
     window.addEventListener("keyup", (e) => {
-
         if (e.code === "AltLeft" || e.code === "AltRight") {
             altPressed = false;
         }
-
     }, true);
 }
 
@@ -67,6 +61,10 @@ function keyOf(e) {
     return (e.key || "").toLowerCase();
 }
 
+function isCode(e, code) {
+    return e.code === code;
+}
+
 /* =========================
    Shortcut handlers
    ========================= */
@@ -79,23 +77,22 @@ function handleBlockRefresh(e) {
     const key = keyOf(e);
     const mod = isModPressed(e);
 
-    const isRefreshCombo = (mod && key === "r") || key === "f5";
+    const isRefreshCombo = (mod && (isCode(e, "KeyR") || key === "r")) || key === "f5";
     if (!isRefreshCombo) return false;
 
     e.preventDefault();
     e.stopPropagation();
     return true;
 }
+
 /**
  * Save shortcut (Mod+S).
  * Delegates to the UI "Save" action to keep behavior centralized.
  */
 function handleSaveShortcut(e, dom) {
-    const key = keyOf(e);
     const mod = isModPressed(e);
 
-    // Mod+S, but NOT Mod+Shift+S (that's Save As)
-    const isSave = mod && !e.shiftKey && key === "s";
+    const isSave = mod && !e.shiftKey && isCode(e, "KeyS");
     if (!isSave) return false;
 
     e.preventDefault();
@@ -107,10 +104,9 @@ function handleSaveShortcut(e, dom) {
  * Save As shortcut (Mod+Shift+S).
  */
 function handleSaveAsShortcut(e, dom) {
-    const key = keyOf(e);
     const mod = isModPressed(e);
 
-    const isSaveAs = mod && e.shiftKey && key === "s";
+    const isSaveAs = mod && e.shiftKey && isCode(e, "KeyS");
     if (!isSaveAs) return false;
 
     e.preventDefault();
@@ -123,8 +119,7 @@ function handleSaveAsShortcut(e, dom) {
  * Only triggers when the editor has focus.
  */
 function handleTabInsertion(e, dom) {
-    const key = keyOf(e);
-    if (key !== "tab") return false;
+    if (e.code !== "Tab") return false;
 
     const editor = getEditorElement(dom);
     if (!editor) return false;
@@ -182,30 +177,20 @@ function insertTextIntoTextarea(textarea, text) {
 
 /** Inserts text into contenteditable (fallback). */
 function insertTextIntoContentEditable(text) {
-    // execCommand is deprecated but still widely supported in webviews.
-    // If you later move to a custom editor engine, replace this.
     document.execCommand("insertText", false, text);
 }
 
 /**
  * New tab shortcut (Mod+N).
- * Uses tabs API if available, falls back to UI button.
  */
-function handleNewTabShortcut(e, dom, tabs) {
-    const key = keyOf(e);
+function handleNewTabShortcut(e, tabs) {
     const mod = isModPressed(e);
 
-    const isNewTab = mod && key === "n";
+    const isNewTab = mod && !e.shiftKey && isCode(e, "KeyN");
     if (!isNewTab) return false;
 
     e.preventDefault();
-
-    if (tabs?.newTab) {
-        tabs.newTab();
-    } else {
-        // fallback (legacy behavior)
-        dom.menuNew?.click();
-    }
+    tabs?.newTab?.();
 
     return true;
 }
@@ -215,15 +200,13 @@ function handleNewTabShortcut(e, dom, tabs) {
  * Delegates to UI open button to keep logic centralized.
  */
 function handleOpenShortcut(e, dom) {
-    const key = keyOf(e);
     const mod = isModPressed(e);
 
-    const isOpen = mod && key === "o";
+    const isOpen = mod && isCode(e, "KeyO");
     if (!isOpen) return false;
 
     e.preventDefault();
     dom.menuOpen?.click();
-
     return true;
 }
 
@@ -231,10 +214,10 @@ function handleOpenShortcut(e, dom) {
  * Close active tab (Mod+W).
  */
 function handleCloseTabShortcut(e, tabs) {
-    const key = keyOf(e);
     const mod = isModPressed(e);
 
-    if (!(mod && key === "w")) return false;
+    const isCloseTab = mod && !e.shiftKey && e.code === "KeyW";
+    if (!isCloseTab) return false;
 
     e.preventDefault();
 
@@ -251,9 +234,8 @@ function handleCloseTabShortcut(e, tabs) {
  * Uses e.code for layout-independent detection.
  */
 function handleNextTabShortcut(e, tabs) {
-
     if (!altPressed) return false;
-    if (e.code !== "ArrowRight") return false;
+    if (!isCode(e, "ArrowRight")) return false;
 
     e.preventDefault();
     e.stopPropagation();
@@ -267,9 +249,8 @@ function handleNextTabShortcut(e, tabs) {
  * Switch to previous tab (Alt+Left).
  */
 function handlePrevTabShortcut(e, tabs) {
-
     if (!altPressed) return false;
-    if (e.code !== "ArrowLeft") return false;
+    if (!isCode(e, "ArrowLeft")) return false;
 
     e.preventDefault();
     e.stopPropagation();
@@ -288,10 +269,10 @@ function switchRelativeTab(tabs, delta) {
 
     if (!list?.length || !active) return;
 
-    const idx = list.findIndex(t => t.id === active.id);
+    const idx = list.findIndex((t) => t.id === active.id);
     if (idx === -1) return;
 
     const nextIdx = (idx + delta + list.length) % list.length;
 
-    tabs.switchToTab?.(list[nextIdx].id);
+    tabs?.switchToTab?.(list[nextIdx].id);
 }

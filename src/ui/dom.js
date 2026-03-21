@@ -13,6 +13,7 @@ export function getDom() {
         autosaveStatus: document.querySelector("#autosaveStatus"),
         charCountEl: document.querySelector("#charCount"),
         recentList: document.querySelector("#recentList"),
-        tabs: document.querySelector("#tabs")
+        tabs: document.querySelector("#tabs"),
+        menuSettings: document.querySelector("#menuSettings"),
     };
 }

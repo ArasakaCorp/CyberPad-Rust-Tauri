@@ -25,8 +25,11 @@ export function createTabState(initial) {
         setActive(id) {
             if (s.activeId === id) return;
             s.activeId = id;
+            s.hoverId = null;
             emit("active:changed", { id });
+            emit("hover:changed", { id: null });
         },
+
         setHover(idOrNull) {
             if (s.hoverId === idOrNull) return;
             s.hoverId = idOrNull;

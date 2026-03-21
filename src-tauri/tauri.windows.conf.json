@@ -1,0 +1,20 @@
+{
+  "bundle": {
+    "targets": ["nsis", "msi"],
+    "windows": {
+      "allowDowngrades": true,
+      "webviewInstallMode": { "type": "downloadBootstrapper", "silent": true },
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "installMode": "currentUser",
+        "startMenuFolder": "CyberPad",
+        "displayLanguageSelector": false,
+        "compression": "lzma"
+      },
+      "wix": {
+        "language": "en-US",
+        "upgradeCode": "4314b947-597f-55fd-917a-cf735a07aaa6"
+      }
+    }
+  }
+}

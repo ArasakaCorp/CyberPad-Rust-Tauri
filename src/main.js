@@ -8,7 +8,7 @@ import { initDrawer } from "./features/drawer.js";
 import { initCounter, updateCharCount } from "./features/counter.js";
 import { initShortcuts } from "./features/shortcuts.js";
 
-import { initWindowButtons, initOpenSave, applyOpenedFile } from "./features/fileActions.js";
+import {initOpenSave, applyOpenedFile } from "./features/fileActions.js";
 import { initAutosave } from "./features/autosave.js";
 import { initRecent, pushRecent } from "./features/recentFiles.js";
 import { initHistory } from "./features//history/history.js";
@@ -16,6 +16,9 @@ import { initDragDrop } from "./features/dragDrop.js";
 import { initCredits } from "./features/credits.js";
 import { initTabs } from "./features/tabs/TabsController.js";
 import { loadTheme, applyTheme } from "./ui/themes.js";
+import { initWindowButtons, initSettings, initSettingsEvents} from "./features/menu.js";
+
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
 async function main() {
     const root = document.querySelector("#app");
@@ -58,12 +61,14 @@ async function main() {
     const onOpened = (filePath) => {
         pushRecent(dom, filePath);
         autosave.setAutosaveState("idle");
-        history.reset(dom.editor.value);
+        history.resetActive(dom.editor.value);
     };
 
 
     initOpenSave(dom, state, { onOpened, tabs });
     initDragDrop(dom, state, { onOpened, tabs });
+    await initSettings(dom);
+    await initSettingsEvents();
 }
 
 main();
