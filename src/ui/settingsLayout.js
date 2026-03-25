@@ -47,6 +47,8 @@ export function renderSettingsLayout(root) {
                 <h2>Themes</h2>
                 <div class="theme-grid">
                   <button class="theme-card is-active" data-theme="memory-shard">Memory Shard</button>
+                  <button class="theme-card" data-theme="militech-record">Militech Record</button>
+                  <button class="theme-card" data-theme="arasaka-log">Arasaka Log</button>
                 </div>
               </section>
 

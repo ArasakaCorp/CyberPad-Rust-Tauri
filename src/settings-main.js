@@ -4,6 +4,12 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { renderSettingsLayout } from "./ui/settingsLayout";
 import { getSettingsDom } from "./ui/settingsDom";
 import { initStorageActions } from "./settings/initStorageActions.js";
+import { loadTheme, applyTheme } from "./ui/themes.js";
+
+window.addEventListener("DOMContentLoaded", async () => {
+    const theme = await loadTheme();
+    applyTheme(theme);
+});
 
 function switchPane(dom, paneName) {
     dom.navItems.forEach((btn) => {
