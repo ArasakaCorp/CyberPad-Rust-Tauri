@@ -1,16 +1,19 @@
 export async function loadTheme() {
-    const saved = localStorage.getItem("cyberpad:theme");
+    //const saved = localStorage.getItem("cyberpad:theme");
 
-    if (saved) return JSON.parse(saved);
+    //if (saved) return JSON.parse(saved);
 
     // default
-    const res = await fetch("/themes/theme_default.json");
+    //const res = await fetch("/themes/theme_default.json");
 
     //Militech
     //const res = await fetch("/themes/theme_militech.json");
 
     //Arasaka
     //const res = await fetch("/themes/theme_arasaka.json");
+
+    //Arasaka
+    const res = await fetch("/themes/theme_petrochem.json");
 
     const data = await res.json();
     console.log(data);
