@@ -1,5 +1,5 @@
 {
-  "name": "Petrochem Purist",
+  "name": "petrochem-purist",
   "vars": {
     "--app-bg-rgb": "255, 255, 255",
     "--panel-rgb": "245, 245, 245",

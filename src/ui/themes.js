@@ -1,6 +1,6 @@
 export async function loadTheme() {
     const saved = localStorage.getItem("cyberpad:theme");
-
+    console.log("loadTheme", saved);
     if (saved) {
         try {
             return JSON.parse(saved);

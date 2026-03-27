@@ -92,6 +92,8 @@ async fn save_as_dialog(
         .file()
         .add_filter("Text", &["txt", "log"])
         .add_filter("Markdown", &["md"])
+        .add_filter("SQL", &["sql"])
+        .add_filter("JSON", &["json"])
         .add_filter("All files", &["*"])
         .set_file_name(suggested_name)
         .blocking_save_file()?; // ok if you intentionally want blocking

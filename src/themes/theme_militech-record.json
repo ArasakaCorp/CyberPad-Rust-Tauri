@@ -1,5 +1,5 @@
 {
-  "name": "Militech Memo (Navy + Pale Yellow)",
+  "name": "militech-record",
   "vars": {
     "--app-bg-rgb": "9, 17, 24",
     "--panel-rgb": "12, 26, 36",

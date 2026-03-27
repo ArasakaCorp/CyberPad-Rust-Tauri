@@ -31,7 +31,7 @@
     "active": true,
     "fileAssociations": [
       {
-        "ext": ["txt", "log", "md"],
+        "ext": ["txt", "log", "md", "sql", "json"],
         "name": "CyberPad Note",
         "description": "CyberPad text note"
       }

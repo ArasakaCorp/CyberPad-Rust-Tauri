@@ -1,5 +1,5 @@
 {
-  "name": "Memory Shard Theme",
+  "name": "memory-shard",
   "vars": {
     "--app-bg-rgb": "7, 11, 16",
     "--panel-rgb": "8, 16, 22",

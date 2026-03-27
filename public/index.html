@@ -214,6 +214,50 @@
                     0 0 22px rgba(var(--accent-rgb), 0.10);
         }
 
+        .picker-list{
+            display:flex;
+            flex-direction:column;
+            gap:10px;
+            padding:14px;
+            overflow:auto;
+        }
+
+        .picker-row{
+            display:grid;
+            grid-template-columns: 1fr 56px;
+            gap:12px;
+            align-items:center;
+        }
+
+        .picker-label{
+            color: rgba(var(--text-rgb), 0.82);
+            font-size:12px;
+            font-weight:700;
+            letter-spacing:0.12em;
+            text-transform:uppercase;
+        }
+
+        .color-input{
+            width:56px;
+            height:34px;
+            padding:4px;
+            border:1px solid rgba(var(--accent-rgb), 0.18);
+            background: rgba(var(--panel-rgb), 0.55);
+            cursor:pointer;
+        }
+
+        .color-input::-webkit-color-swatch-wrapper{
+            padding:0;
+        }
+
+        .color-input::-webkit-color-swatch{
+            border:none;
+        }
+
+        .control-block{
+            overflow:hidden;
+        }
+
         .control-block{
             position:relative;
             flex:1;
@@ -547,10 +591,56 @@
 
         <div class="control-block">
             <div class="control-header">
-                <span class="control-name">theme.json</span>
+                <span class="control-name">live controls</span>
                 <span class="status ok" id="statusLabel">valid</span>
             </div>
-            <textarea id="jsonInput" class="json-editor" spellcheck="false"></textarea>
+
+            <div class="picker-list">
+                <label class="picker-row">
+                    <span class="picker-label">App Background</span>
+                    <input class="color-input" type="color" data-var="--app-bg-rgb">
+                </label>
+
+                <label class="picker-row">
+                    <span class="picker-label">Panel</span>
+                    <input class="color-input" type="color" data-var="--panel-rgb">
+                </label>
+
+                <label class="picker-row">
+                    <span class="picker-label">Text</span>
+                    <input class="color-input" type="color" data-var="--text-rgb">
+                </label>
+
+                <label class="picker-row">
+                    <span class="picker-label">Editor Text</span>
+                    <input class="color-input" type="color" data-var="--text-editor-rgb">
+                </label>
+
+                <label class="picker-row">
+                    <span class="picker-label">Accent</span>
+                    <input class="color-input" type="color" data-var="--accent-rgb">
+                </label>
+
+                <label class="picker-row">
+                    <span class="picker-label">Header</span>
+                    <input class="color-input" type="color" data-var="--header-color-rgb">
+                </label>
+
+                <label class="picker-row">
+                    <span class="picker-label">Success</span>
+                    <input class="color-input" type="color" data-var="--success-rgb">
+                </label>
+
+                <label class="picker-row">
+                    <span class="picker-label">Warning</span>
+                    <input class="color-input" type="color" data-var="--warning-rgb">
+                </label>
+
+                <label class="picker-row">
+                    <span class="picker-label">Danger</span>
+                    <input class="color-input" type="color" data-var="--danger-rgb">
+                </label>
+            </div>
         </div>
 
         <div class="error-box" id="errorBox"></div>
@@ -666,6 +756,65 @@
     const statusLabel = document.getElementById("statusLabel");
     const charCount = document.getElementById("charCount");
     const themeItems = document.querySelectorAll(".theme-item");
+    const colorInputs = document.querySelectorAll(".color-input");
+
+    let currentTheme = structuredClone(THEMES.memory);
+
+    function rgbStringToHex(rgbString){
+        const parts = String(rgbString).split(",").map(v => Number(v.trim()));
+        if (parts.length !== 3 || parts.some(Number.isNaN)) return "#000000";
+
+        return "#" + parts
+            .map(v => Math.max(0, Math.min(255, v)).toString(16).padStart(2, "0"))
+            .join("");
+    }
+
+    function hexToRgbString(hex){
+        const clean = hex.replace("#", "");
+        const full = clean.length === 3
+            ? clean.split("").map(ch => ch + ch).join("")
+            : clean;
+
+        const int = parseInt(full, 16);
+
+        return [
+            (int >> 16) & 255,
+            (int >> 8) & 255,
+            int & 255
+        ].join(", ");
+    }
+
+    function refreshPickers(){
+        colorInputs.forEach(input => {
+            const cssVar = input.dataset.var;
+            const value = currentTheme.vars[cssVar];
+            if (value) {
+                input.value = rgbStringToHex(value);
+            }
+        });
+    }
+
+    function refreshJsonView(){
+        const text = JSON.stringify(currentTheme, null, 2);
+        previewEditor.value = text;
+        updateCharCount(text);
+    }
+
+    function syncFromTheme(){
+        try {
+            applyTheme(currentTheme);
+            refreshPickers();
+            refreshJsonView();
+
+            errorBox.textContent = "";
+            statusLabel.textContent = "valid";
+            statusLabel.className = "status ok";
+        } catch (err) {
+            errorBox.textContent = err.message;
+            statusLabel.textContent = "invalid";
+            statusLabel.className = "status error";
+        }
+    }
 
     function applyTheme(theme){
         if (!theme || typeof theme !== "object" || !theme.vars || typeof theme.vars !== "object") {
@@ -727,11 +876,8 @@
             btn.classList.toggle("is-active", btn.dataset.theme === themeId);
         });
 
-        const theme = THEMES[themeId];
-        const text = JSON.stringify(theme, null, 2);
-        jsonInput.value = text;
-        previewEditor.value = text;
-        syncFrom(jsonInput, previewEditor);
+        currentTheme = structuredClone(THEMES[themeId]);
+        syncFromTheme();
     }
 
     themeItems.forEach(btn => {
@@ -740,8 +886,28 @@
         });
     });
 
-    jsonInput.addEventListener("input", () => syncFrom(jsonInput, previewEditor));
-    previewEditor.addEventListener("input", () => syncFrom(previewEditor, jsonInput));
+    colorInputs.forEach(input => {
+        input.addEventListener("input", () => {
+            const cssVar = input.dataset.var;
+            currentTheme.vars[cssVar] = hexToRgbString(input.value);
+            syncFromTheme();
+        });
+    });
+
+    previewEditor.addEventListener("input", () => {
+        try {
+            currentTheme = validateTheme(previewEditor.value);
+            themeItems.forEach(btn => btn.classList.remove("is-active"));
+            syncFromTheme();
+        } catch (err) {
+            errorBox.textContent = err.message;
+            statusLabel.textContent = "invalid";
+            statusLabel.className = "status error";
+            updateCharCount(previewEditor.value);
+        }
+    });
+
+    setActiveTheme("memory");
 
     setActiveTheme("memory");
 </script>

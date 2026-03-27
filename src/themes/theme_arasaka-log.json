@@ -1,5 +1,5 @@
 {
-  "name": "Arasaka Log",
+  "name": "arasaka-log",
   "vars": {
     "--app-bg-rgb": "3, 3, 3",
     "--panel-rgb": "18, 18, 18",
