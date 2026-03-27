@@ -5,6 +5,7 @@ import { renderSettingsLayout } from "./ui/settingsLayout";
 import { getSettingsDom } from "./ui/settingsDom";
 import { initStorageActions } from "./settings/initStorageActions.js";
 import { loadTheme, applyTheme } from "./ui/themes.js";
+import { initThemeActions } from "./features/themeActions.js";
 
 window.addEventListener("DOMContentLoaded", async () => {
     const theme = await loadTheme();
@@ -38,6 +39,7 @@ function main() {
         await win.close();
     });
     initStorageActions(dom);
+    initThemeActions(dom);
 }
 
 main();

@@ -3,8 +3,11 @@
   "vars": {
     "--app-bg-rgb": "7, 11, 16",
     "--panel-rgb": "8, 16, 22",
+    "--rail-rgb": "12, 12, 12",
     "--text-rgb": "207, 233, 242",
+    "--text-editor-rgb": "51, 214, 255",
     "--accent-rgb": "51, 214, 255",
+    "--header-color-rgb":  "51, 214, 255",
     "--success-rgb": "51, 255, 204",
     "--warning-rgb": "255, 176, 0",
     "--danger-rgb": "255, 90, 90",

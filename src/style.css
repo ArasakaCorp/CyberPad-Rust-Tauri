@@ -2,14 +2,18 @@
 :root{
     /* Theme palette (default: original CyberPad cyan) */
     /* IMPORTANT: keep RGB comma-separated for rgba(var(--x), a) compatibility */
-    --app-bg-rgb: 7, 11, 16;          /* #070b10 */
-    --panel-rgb: 8, 16, 22;           /* base HUD panel glass */
-    --text-rgb: 207, 233, 242;        /* #cfe9f2 */
-    --accent-rgb: 51, 214, 255;       /* #33d6ff */
-    --success-rgb: 51, 255, 204;      /* #33ffcc */
-    --warning-rgb: 255, 176, 0;       /* warm amber */
-    --danger-rgb: 255, 90, 90;        /* unsaved/blocked close */
+    --app-bg-rgb: 7, 11, 16;
+    --panel-rgb: 8, 16, 22;
+    --text-rgb: 207, 233, 242;
+    --accent-rgb: 51, 214, 255;
+    --success-rgb: 51, 255, 204;
+    --warning-rgb: 255, 176, 0;
+    --danger-rgb: 255, 90, 90;
     --shadow-rgb: 0, 0, 0;
+
+    /* New semantic tokens */
+    --text-editor-rgb: var(--text-rgb);
+    --header-color-rgb: var(--accent-rgb);
 
     /* Backward-compatible tokens (so existing CSS doesn't break) */
     --bg: rgb(var(--app-bg-rgb));
@@ -172,15 +176,15 @@ html, body{
 }
 
 .header-value{
-    color: rgba(var(--accent-rgb), 0.99);
+    color: rgba(var(--header-color-rgb), 0.99);
     font-size: 20px;
     font-weight: 800;
     letter-spacing: 0.25em;
     text-transform: uppercase;
 
     text-shadow:
-            0 0 12px rgba(var(--accent-rgb), 0.60),
-            0 0 26px rgba(var(--accent-rgb), 0.28);
+            0 0 12px rgba(var(--header-color-rgb), 0.60),
+            0 0 26px rgba(var(--header-color-rgb), 0.28);
 
     white-space: nowrap;
     overflow: hidden;
@@ -291,7 +295,7 @@ textarea{
     outline: none;
     background: transparent;
 
-    color: rgba(var(--accent-rgb), 0.96);
+    color: rgba(var(--text-editor-rgb), 0.96);
     text-shadow: 0 0 8px rgba(var(--accent-rgb), 0.18);
     padding: 6px 4px;
     font-family: "Play", "Blender Pro", sans-serif;
@@ -303,7 +307,7 @@ textarea{
 }
 
 textarea::placeholder{
-    color: rgba(var(--accent-rgb), 0.30);
+    color: rgba(var(--text-editor-rgb), 0.30);
     text-shadow: none;
 }
 

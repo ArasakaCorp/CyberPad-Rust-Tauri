@@ -1,24 +1,17 @@
 export async function loadTheme() {
-    //const saved = localStorage.getItem("cyberpad:theme");
+    const saved = localStorage.getItem("cyberpad:theme");
 
-    //if (saved) return JSON.parse(saved);
+    if (saved) {
+        try {
+            return JSON.parse(saved);
+        } catch (e) {
+            console.warn("Failed to parse saved theme", e);
+        }
+    }
 
-    // default
-    //const res = await fetch("/themes/theme_default.json");
-
-    //Militech
-    //const res = await fetch("/themes/theme_militech.json");
-
-    //Arasaka
-    //const res = await fetch("/themes/theme_arasaka.json");
-
-    //Arasaka
-    const res = await fetch("/themes/theme_petrochem.json");
-
-    const data = await res.json();
-    console.log(data);
-
-    return data;
+    // fallback
+    const res = await fetch("/themes/theme_default.json");
+    return await res.json();
 }
 
 export function applyTheme(theme, targetDocument = document) {
