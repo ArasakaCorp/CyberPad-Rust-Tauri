@@ -1172,3 +1172,82 @@ textarea{
         gap: 6px;
     }
 }
+
+
+.theme-custom-wrap {
+    margin-top: 14px;
+    display: grid;
+    gap: 10px;
+}
+
+.theme-custom-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.theme-custom-title {
+    font-size: 12px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    opacity: 0.82;
+}
+
+.theme-lab-link {
+    font-size: 12px;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: rgb(var(--accent-rgb));
+    opacity: 0.9;
+}
+
+.theme-lab-link:hover {
+    opacity: 1;
+}
+
+.theme-json-editor {
+    width: 100%;
+    min-height: 260px;
+    resize: vertical;
+    padding: 12px;
+    border: 1px solid rgba(var(--accent-rgb), 0.22);
+    background: rgba(var(--panel-rgb), 0.72);
+    color: rgb(var(--text-rgb));
+    font: 12px/1.55 "Consolas", "Courier New", monospace;
+    outline: none;
+    box-sizing: border-box;
+}
+
+.theme-json-editor:focus {
+    border-color: rgba(var(--accent-rgb), 0.55);
+    box-shadow: 0 0 0 1px rgba(var(--accent-rgb), 0.22);
+}
+
+.theme-custom-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.theme-json-status {
+    min-height: 18px;
+    margin: 0;
+    font-size: 12px;
+    color: rgb(var(--text-rgb));
+    opacity: 0.82;
+}
+
+.theme-json-status.is-error {
+    color: rgb(var(--danger-rgb));
+    opacity: 1;
+}
+
+.theme-json-status.is-success {
+    color: rgb(var(--success-rgb));
+    opacity: 1;
+}
+
+.settings-btn-ghost {
+    background: rgba(var(--danger-rgb), 0.10);
+    box-shadow: inset 0 0 18px rgba(var(--shadow-rgb), 0.35), 0 0 18px rgba(var(--danger-rgb), 0.08);
+}
