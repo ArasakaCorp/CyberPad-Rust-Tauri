@@ -90,8 +90,8 @@ export function renderSettingsLayout(root) {
             }</textarea>
             
                 <div class="theme-custom-actions">
-                  <button class="settings-btn settings-actions menu-item settings-nav-item" type="button" data-theme-apply-btn>Apply</button>
-                  <button class="settings-btn settings-btn-ghost settings-actions menu-item settings-nav-item" type="button" data-theme-reset-btn>
+                  <button class="settings-btn" type="button" data-theme-apply-btn>Apply</button>
+                  <button class="settings-btn settings-btn-ghost " type="button" data-theme-reset-btn>
                     Reset
                   </button>
                 </div>
