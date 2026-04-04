@@ -104,7 +104,7 @@ export function renderSettingsLayout(root) {
                 <h2>About</h2>
                 <div class="settings-list">
                   <div class="settings-row"><span>App</span><span>CyberPad</span></div>
-                  <div class="settings-row"><span>Version</span><span>v0.1.3</span></div>
+                  <div class="settings-row"><span>Version</span><span>v0.1.4</span></div>
                   <div class="settings-row"><span>Author</span><span>Nutcracker</span></div>
                 </div>
               </section>
