@@ -3,6 +3,7 @@ import { resolve } from "node:path";
 
 export default defineConfig({
     root: "src",
+    publicDir: "../themes",
     base: "./",
     build: {
         outDir: "../dist",

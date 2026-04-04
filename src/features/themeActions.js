@@ -169,7 +169,7 @@ export function initThemeActions(dom) {
             toggleCustomEditor(dom, false);
 
             try {
-                const res = await fetch(`/themes/theme_${themeId}.json`);
+                const res = await fetch(`./theme_${themeId}.json`);
                 const theme = await res.json();
 
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(theme));
