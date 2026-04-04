@@ -1,5 +1,7 @@
 # CyberPad
 
+![CyberPad Preview](./preview.png)
+
 Minimalist industrial notepad for people who prefer terminals over toys.
 
 CyberPad is a lightweight, frameless, transparent **Tauri‑based
@@ -15,23 +17,21 @@ than software.
 
 ------------------------------------------------------------------------
 
-# ✦ What's New --- Tab Engine
+# ✦ What's New 0.1.4 --- Themes introduced
 
-CyberPad now includes a full tab engine with persistent state and
-isolated editor history.
+CyberPad now includes a possibility to switch between different themes.
+There a few of them inspired by the original *Cyberpunk 2077* game. 
+Build-in themes:
+- Memory Shard (CyberPad default theme)
+- Militech Record
+- Arasaka Log
+- Petrochem Purist (Light theme)
 
-New capabilities:
+But mostly important you can do your own theme, using JSON files.
+Visit: https://arasakacorp.github.io/CyberPad-Rust-Tauri/
 
--   Multi‑tab system
--   Per‑tab undo / redo history
--   Persistent tab session restore
--   Per‑tab autosave
--   Dirty state tracking per tab
--   Tab close protection
--   Header preview system
--   Persistent tab snapshots
-
-Each tab behaves like an independent editor instance.
+Copy past color theme in the: Settings -> Themes -> Custom 
+and save it.
 
 ------------------------------------------------------------------------
 
@@ -123,21 +123,6 @@ Redo\
 
 ------------------------------------------------------------------------
 
-# ✦ Architecture
-
-    src/
-      features/
-        tabs/
-        history/
-        autosave/
-      ui/
-
-    src-tauri/
-      src/
-        lib.rs
-
-------------------------------------------------------------------------
-
 # ✦ Tech Stack
 
 Frontend:
@@ -172,6 +157,19 @@ Build:
 ``` bash
 npm run tauri build
 ```
+
+------------------------------------------------------------------------
+
+# ✦ Acknowledgments
+
+Many thanks for all attention to the project. Making this project it's 
+it's something new for me, and all the opinions and activity is inspiring
+me to keep working on it.
+
+Special thanks to:
+-   [Trensiel](https://github.com/trensiel) - testing and bug reports
+
+And also CD PROJECT RED, for original idea, beautiful designs and inspiration.
 
 ------------------------------------------------------------------------
 

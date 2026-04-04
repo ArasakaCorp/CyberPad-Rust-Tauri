@@ -1,6 +1,5 @@
 export async function loadTheme() {
     const saved = localStorage.getItem("cyberpad:theme");
-    console.log("loadTheme", saved);
     if (saved) {
         try {
             return JSON.parse(saved);
@@ -8,9 +7,8 @@ export async function loadTheme() {
             console.warn("Failed to parse saved theme", e);
         }
     }
-
     // fallback
-    const res = await fetch("/themes/theme_default.json");
+    const res = await fetch("./theme_memory-shard.json");
     return await res.json();
 }
 
