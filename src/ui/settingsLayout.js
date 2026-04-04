@@ -58,7 +58,7 @@ export function renderSettingsLayout(root) {
                 <div class="theme-custom-head">
                   <div class="theme-custom-title">Custom Theme JSON</div>
                   <a
-                    href="#"
+                    href="https://arasakacorp.github.io/CyberPad-Rust-Tauri/"
                     class="theme-lab-link"
                     data-theme-lab-link
                     target="_blank"
