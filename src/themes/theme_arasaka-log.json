@@ -1,0 +1,16 @@
+{
+  "name": "arasaka-log",
+  "vars": {
+    "--app-bg-rgb": "3, 3, 3",
+    "--panel-rgb": "18, 18, 18",
+    "--rail-rgb": "12, 12, 12",
+    "--text-rgb": "250, 248, 233",
+    "--text-editor-rgb": "250, 248, 233",
+    "--accent-rgb": "224, 60, 47",
+    "--header-color-rgb": "250, 248, 233",
+    "--success-rgb": "200, 255, 230",
+    "--warning-rgb": "255, 176, 0",
+    "--danger-rgb": "255, 90, 90",
+    "--shadow-rgb": "0, 0, 0"
+  }
+}

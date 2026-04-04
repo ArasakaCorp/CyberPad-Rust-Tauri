@@ -43,12 +43,62 @@ export function renderSettingsLayout(root) {
                 </div>
               </section>
 
-              <section class="settings-pane" data-pane-view="themes" hidden>
-                <h2>Themes</h2>
-                <div class="theme-grid">
-                  <button class="theme-card is-active" data-theme="memory-shard">Memory Shard</button>
+            <section class="settings-pane" data-pane-view="themes" hidden>
+              <h2>Themes</h2>
+            
+              <div class="theme-grid">
+                <button class="theme-card is-active" data-theme="memory-shard">Memory Shard</button>
+                <button class="theme-card" data-theme="militech-record">Militech Record</button>
+                <button class="theme-card" data-theme="arasaka-log">Arasaka Log</button>
+                <button class="theme-card" data-theme="petrochem-purist">Petrochem Purist</button>
+                <button class="theme-card theme-card-custom" data-theme="custom-style">Custom Style</button>
+              </div>
+            
+              <div class="theme-custom-wrap" hidden data-theme-custom-wrap>
+                <div class="theme-custom-head">
+                  <div class="theme-custom-title">Custom Theme JSON</div>
+                  <a
+                    href="#"
+                    class="theme-lab-link"
+                    data-theme-lab-link
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Open Theme Lab
+                  </a>
                 </div>
-              </section>
+            
+                <textarea
+                  class="theme-json-editor"
+                  data-theme-json-editor
+                  spellcheck="false"
+                >{
+              "name": "custom-style",
+              "vars": {
+                "--app-bg-rgb": "7, 11, 16",
+                "--panel-rgb": "8, 16, 22",
+                "--rail-rgb": "12, 12, 12",
+                "--text-rgb": "207, 233, 242",
+                "--text-editor-rgb": "51, 214, 255",
+                "--accent-rgb": "51, 214, 255",
+                "--header-color-rgb": "51, 214, 255",
+                "--success-rgb": "51, 255, 204",
+                "--warning-rgb": "255, 176, 0",
+                "--danger-rgb": "255, 90, 90",
+                "--shadow-rgb": "0, 0, 0"
+              }
+            }</textarea>
+            
+                <div class="theme-custom-actions">
+                  <button class="settings-btn" type="button" data-theme-apply-btn>Apply</button>
+                  <button class="settings-btn settings-btn-ghost " type="button" data-theme-reset-btn>
+                    Reset
+                  </button>
+                </div>
+            
+                <p class="theme-json-status" data-theme-json-status></p>
+              </div>
+            </section>
 
               <section class="settings-pane" data-pane-view="about" hidden>
                 <h2>About</h2>

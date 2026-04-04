@@ -32,6 +32,10 @@ function createEmptyTab() {
         content: "",
         dirty: false,
         _scratch: true,
+        viewState: {
+            cursor: 0,
+            scrollTop: 0,
+        },
     };
 }
 
@@ -162,26 +166,43 @@ export async function initTabs(
     /* editor sync              */
     /* ------------------------- */
 
+    function getEditorViewState() {
+        return {
+            cursor: dom.editor.selectionStart ?? 0,
+            scrollTop: dom.editor.scrollTop ?? 0,
+        };
+    }
+
     function persistActiveContent() {
-
         const active = state.getActive();
+        if (!active) return;
 
-        if (active)
-            active.content = dom.editor.value;
+        state.update(active.id, {
+            content: dom.editor.value,
+            viewState: getEditorViewState(),
+        });
     }
 
     function applyActiveToEditor() {
-
         const active = state.getActive();
-
         if (!active) return;
 
-        if (dom.editor.value !== active.content)
+        if (dom.editor.value !== active.content) {
             dom.editor.value = active.content ?? "";
+        }
+
+        const view = active.viewState ?? {};
+        const maxPos = dom.editor.value.length;
+        const cursor = Math.min(view.cursor ?? 0, maxPos);
+
+        dom.editor.focus();
+        dom.editor.selectionStart = cursor;
+        dom.editor.selectionEnd = cursor;
+        dom.editor.scrollTop = view.scrollTop ?? 0;
 
         autosave?.resetAutosaveForTab?.(active.id);
-
         dom.__updateCharCount?.();
+
     }
 
 
@@ -190,15 +211,12 @@ export async function initTabs(
     /* ------------------------- */
 
     function switchToTab(tabId) {
-
         persistActiveContent();
 
         const next = state.getTab(tabId);
-
         if (!next) return;
 
         state.setActive(next.id);
-
         applyActiveToEditor();
     }
 
@@ -230,7 +248,11 @@ export async function initTabs(
                 ? content.trim().length > 0
                 : tab.dirty;
 
-            state.update(tab.id, { content, dirty });
+            state.update(tab.id, {
+                content,
+                dirty,
+                viewState: getEditorViewState(),
+            });
         }
 
         const fresh = state.getTab(tabId);

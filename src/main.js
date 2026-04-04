@@ -15,12 +15,27 @@ import { initHistory } from "./features//history/history.js";
 import { initDragDrop } from "./features/dragDrop.js";
 import { initCredits } from "./features/credits.js";
 import { initTabs } from "./features/tabs/TabsController.js";
+import { loadTheme, applyTheme } from "./ui/themes.js";
 import { initWindowButtons, initSettings, initSettingsEvents} from "./features/menu.js";
+import { listen } from "@tauri-apps/api/event";
+
 
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
 async function main() {
+    window.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+    });
+
     const root = document.querySelector("#app");
+
+    const theme = await loadTheme();
+    applyTheme(theme);
+
+    listen("theme:change", (event) => {
+        applyTheme(event.payload);
+    });
+
     renderLayout(root);
 
 

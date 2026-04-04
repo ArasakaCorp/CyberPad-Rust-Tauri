@@ -4,6 +4,13 @@ import { getCurrentWindow } from "@tauri-apps/api/window";
 import { renderSettingsLayout } from "./ui/settingsLayout";
 import { getSettingsDom } from "./ui/settingsDom";
 import { initStorageActions } from "./settings/initStorageActions.js";
+import { loadTheme, applyTheme } from "./ui/themes.js";
+import { initThemeActions } from "./features/themeActions.js";
+
+window.addEventListener("DOMContentLoaded", async () => {
+    const theme = await loadTheme();
+    applyTheme(theme);
+});
 
 function switchPane(dom, paneName) {
     dom.navItems.forEach((btn) => {
@@ -18,6 +25,10 @@ function switchPane(dom, paneName) {
 }
 
 function main() {
+    window.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+    });
+
     const root = document.querySelector("#app");
     renderSettingsLayout(root);
 
@@ -32,6 +43,7 @@ function main() {
         await win.close();
     });
     initStorageActions(dom);
+    initThemeActions(dom);
 }
 
 main();
