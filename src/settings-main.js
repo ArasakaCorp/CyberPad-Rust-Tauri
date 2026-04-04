@@ -25,6 +25,10 @@ function switchPane(dom, paneName) {
 }
 
 function main() {
+    window.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+    });
+
     const root = document.querySelector("#app");
     renderSettingsLayout(root);
 

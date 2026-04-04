@@ -23,6 +23,10 @@ import { listen } from "@tauri-apps/api/event";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
 async function main() {
+    window.addEventListener("contextmenu", (e) => {
+        e.preventDefault();
+    });
+
     const root = document.querySelector("#app");
 
     const theme = await loadTheme();
