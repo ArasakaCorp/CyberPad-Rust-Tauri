@@ -1,13 +1,6 @@
 import { applyTheme } from "../ui/themes.js";
 import { emit } from "@tauri-apps/api/event";
 
-const THEME_MAP = {
-    "memory-shard": "/themes/theme_memory-shard.json",
-    "militech-record": "/themes/theme_militech-record.json",
-    "arasaka-log": "/themes/theme_arasaka-log.json",
-    "petrochem-purist": "/themes/theme_petrochem-purist.json",
-};
-
 const STORAGE_KEY = "cyberpad:theme";
 
 function getSavedTheme() {
@@ -110,10 +103,11 @@ function toggleCustomEditor(dom, show) {
     dom.themeCustomWrap.hidden = !show;
 }
 
-function setActiveThemeCard(dom, activeBtn) {
+function setActiveThemeCard(dom, activeThemeId) {
     if (!dom.themeCards) return;
+
     dom.themeCards.forEach((b) => {
-        b.classList.toggle("is-active", b === activeBtn);
+        b.classList.toggle("is-active", b.dataset.theme === activeThemeId);
     });
 }
 
@@ -149,52 +143,50 @@ async function applyCustomTheme(dom) {
 }
 
 export function initThemeActions(dom) {
-    if (!dom.themeCards) return;
+    if (!dom.themeCards?.length) return;
+
+    const savedTheme = getSavedTheme();
+    const activeId = savedTheme?.name || "memory-shard";
+
+    setActiveThemeCard(dom, activeId);
+    toggleCustomEditor(dom, activeId === "custom-style");
 
     if (dom.themeJsonEditor && !dom.themeJsonEditor.value.trim()) {
         dom.themeJsonEditor.value = JSON.stringify(DEFAULT_CUSTOM_THEME, null, 2);
     }
 
     dom.themeCards.forEach((btn) => {
-    const savedTheme = getSavedTheme();
-    const activeId = savedTheme?.name || "memory-shard";
-
-    setActiveThemeCard(dom, activeId);
-
-    dom.themeCards.forEach(btn => {
         btn.addEventListener("click", async () => {
             const themeId = btn.dataset.theme;
 
             if (themeId === "custom-style") {
                 toggleCustomEditor(dom, true);
-                setActiveThemeCard(dom, btn);
+                setActiveThemeCard(dom, themeId);
                 setStatus(dom, "Edit JSON and click Apply.");
                 return;
             }
 
-            const res = await fetch(`/themes/theme_${themeId}.json`);
-            const theme = await res.json();
+            toggleCustomEditor(dom, false);
 
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(theme));
-            setActiveThemeCard(dom, themeId);
-            applyTheme(theme);
-            await emit("theme:change", theme);
+            try {
+                const res = await fetch(`/themes/theme_${themeId}.json`);
+                const theme = await res.json();
+
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(theme));
+                setActiveThemeCard(dom, themeId);
+                applyTheme(theme);
+                await emit("theme:change", theme);
+                setStatus(dom, "");
+            } catch (err) {
+                setStatus(dom, `Failed to load theme: ${err.message}`, "is-error");
+            }
         });
     });
 
-
-
-        });
-
     dom.themeApplyBtn?.addEventListener("click", async () => {
         await applyCustomTheme(dom);
-
-        const customBtn = [...dom.themeCards].find(
-            (btn) => btn.dataset.theme === "custom-style"
-        );
-        if (customBtn) {
-            setActiveThemeCard(dom, customBtn);
-        }
+        setActiveThemeCard(dom, "custom-style");
+        toggleCustomEditor(dom, true);
     });
 
     dom.themeResetBtn?.addEventListener("click", () => {

@@ -73,7 +73,7 @@ export function renderSettingsLayout(root) {
                   data-theme-json-editor
                   spellcheck="false"
                 >{
-              "name": "Custom Theme",
+              "name": "custom-style",
               "vars": {
                 "--app-bg-rgb": "7, 11, 16",
                 "--panel-rgb": "8, 16, 22",

@@ -1176,8 +1176,11 @@ textarea{
 
 .theme-custom-wrap {
     margin-top: 14px;
-    display: grid;
     gap: 10px;
+}
+
+.theme-custom-wrap:not([hidden]) {
+    display: grid;
 }
 
 .theme-custom-head {
